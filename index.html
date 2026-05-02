@@ -32,6 +32,7 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px}
 .fb{height:27px;padding:0 9px;font-size:11px;border:0.5px solid var(--border2);border-radius:var(--radius);
   background:var(--bg);color:var(--text2);cursor:pointer;transition:background 0.1s,color 0.1s}
 .fb:hover,.fb.active{background:var(--bg2);color:var(--text)}
+#compare-toggle{height:27px;padding:0 10px;font-size:11px}
 #layer-controls{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px 0;align-items:center}
 .lb{height:24px;padding:0 8px;font-size:10px;border:0.5px solid var(--border2);border-radius:999px;
   background:transparent;color:var(--text2);cursor:pointer;transition:background 0.1s,color 0.1s}
@@ -74,7 +75,20 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px}
 	#canvas-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
 	#ecanvas{display:block;width:min(100%,420px);height:auto;aspect-ratio:4/3}
 	#shell-note{font-size:11px;color:var(--text2);text-align:center}
-footer{max-width:1200px;margin:28px auto 0;font-size:11px;color:var(--text3);text-align:center}
+#compare-card{display:none;margin-top:14px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+#compare-card.show{display:block}
+.cmp-title{font-size:11px;color:var(--text2);margin-bottom:7px}
+.cmp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;font-size:11px;color:var(--text)}
+.cmp-col{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:8px}
+.cmp-head{font-size:12px;font-weight:500;margin-bottom:5px}
+.cmp-line{font-size:11px;color:var(--text2);margin:2px 0}
+.cmp-note{font-size:11px;color:var(--text2);margin-top:8px;line-height:1.45}
+footer{max-width:1200px;margin:28px auto 0;text-align:center;padding:12px 8px;background:transparent}
+.credit-title{font-family:Georgia,"Times New Roman",serif;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--text2)}
+.credit-sub{font-family:Georgia,"Times New Roman",serif;font-size:11px;font-style:italic;color:var(--text2);margin-top:4px}
+.credit-copy{font-size:10px;color:var(--text3);margin-top:4px}
+.credit-ko{font-size:9px;color:var(--text3);margin-top:3px}
+@media(max-width:680px){.cmp-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -95,6 +109,7 @@ footer{max-width:1200px;margin:28px auto 0;font-size:11px;color:var(--text3);tex
     <button class="fb" data-cat="post-transition metal">전이 후 금속</button>
     <button class="fb" data-cat="lanthanide">란타넘족</button>
     <button class="fb" data-cat="actinide">악티늄족</button>
+    <button class="fb" id="compare-toggle">비교 모드</button>
   </div>
   <div id="layer-controls">
     <button class="lb active" data-layer="none">기본</button>
@@ -130,9 +145,15 @@ footer{max-width:1200px;margin:28px auto 0;font-size:11px;color:var(--text3);tex
 	      <canvas id="ecanvas" width="320" height="240"></canvas>
 	      <div id="shell-note">전자껍질: - / 최외각 전자: -개</div>
 	    </div>
+      <div id="compare-card"></div>
 	  </div>
 </div>
-<footer>인터랙티브 주기율표 · 데이터 출처: IUPAC 2021</footer>
+<footer>
+  <div class="credit-title">ELEMENT RELATION ATLAS</div>
+  <div class="credit-sub">An interactive chemistry archive by Juwon Jeon</div>
+  <div class="credit-copy">© 2026 Juwon Jeon. All rights reserved.</div>
+  <div class="credit-ko">기획 · 제작: 전주원 · 필업영어</div>
+</footer>
 
 <script>
 const CC={
@@ -272,6 +293,14 @@ const EL=[
 ];
 
 let activeFilter="all", activeSearch="", activeLayer="none", raf=null;
+let compareMode=false, compareSelection=[];
+
+const EXAMPLES={
+  "Cl-Na":"Na + Cl → NaCl",
+  "H-O":"H + O → H₂O",
+  "C-O":"C + O → CO₂",
+  "Mg-O":"Mg + O → MgO"
+};
 
 function gc(cat){return CC[cat]||CC["unknown"]}
 
@@ -302,9 +331,62 @@ function makeCell(el){
   div.innerHTML=`<span class="num">${el.n}</span><span class="sym">${el.sym}</span><span class="elname">${el.name}</span>`;
   div.addEventListener("click",function(){
     const found=EL.find(e=>e.n===parseInt(this.dataset.n));
-    if(found)openPanel(found);
+    if(!found)return;
+    if(compareMode){
+      handleCompareSelect(found);
+      return;
+    }
+    openPanel(found);
   });
   return div;
+}
+function getBondHint(a,b){
+  if(a.cat==="noble gas"||b.cat==="noble gas")return "비활성 기체는 일반적으로 반응성이 낮습니다.";
+  const am=/metal/.test(a.cat)||a.cat==="lanthanide"||a.cat==="actinide";
+  const bm=/metal/.test(b.cat)||b.cat==="lanthanide"||b.cat==="actinide";
+  const an=a.cat==="nonmetal";
+  const bn=b.cat==="nonmetal";
+  if(am&&bm)return "둘 다 금속이므로 금속 결합의 관점에서 볼 수 있습니다.";
+  if((am&&bn)||(bm&&an))return "이온 결합이 만들어지기 쉬운 조합입니다.";
+  if((an&&bn)||a.cat==="metalloid"||b.cat==="metalloid")return "공유 결합을 생각해 볼 수 있는 조합입니다.";
+  return "결합 유형은 조건에 따라 달라질 수 있습니다.";
+}
+function getExample(a,b){
+  const key=[a.sym,b.sym].sort().join("-");
+  return EXAMPLES[key]||"대표 예시는 아직 준비되지 않았습니다.";
+}
+function renderCompareCard(){
+  const card=document.getElementById("compare-card");
+  if(!compareMode||compareSelection.length<2){card.classList.remove("show");card.innerHTML="";return;}
+  const [a,b]=compareSelection;
+  const ea=parseFloat(a.en), eb=parseFloat(b.en);
+  const enDiff=(!Number.isNaN(ea)&&!Number.isNaN(eb))?Math.abs(ea-eb).toFixed(2):"비교 불가";
+  card.innerHTML=`<div class="cmp-title">원소 관계 비교</div>
+  <div class="cmp-grid">
+    <div class="cmp-col">
+      <div class="cmp-head">${a.name} (${a.sym})</div>
+      <div class="cmp-line">원자번호: ${a.n}</div>
+      <div class="cmp-line">분류: ${CKR[a.cat]||a.cat}</div>
+      <div class="cmp-line">최외각 전자: ${valenceElectrons(a)}개</div>
+    </div>
+    <div class="cmp-col">
+      <div class="cmp-head">${b.name} (${b.sym})</div>
+      <div class="cmp-line">원자번호: ${b.n}</div>
+      <div class="cmp-line">분류: ${CKR[b.cat]||b.cat}</div>
+      <div class="cmp-line">최외각 전자: ${valenceElectrons(b)}개</div>
+    </div>
+  </div>
+  <div class="cmp-note">전기음성도 차이: ${enDiff}</div>
+  <div class="cmp-note">결합 성향 힌트: ${getBondHint(a,b)}</div>
+  <div class="cmp-note">대표 예시: ${getExample(a,b)}</div>`;
+  card.classList.add("show");
+}
+function handleCompareSelect(el){
+  openPanel(el);
+  if(compareSelection.length===2)compareSelection=[];
+  if(compareSelection.length===1&&compareSelection[0].n===el.n)return;
+  compareSelection.push(el);
+  renderCompareCard();
 }
 
 function clamp01(v){return Math.max(0,Math.min(1,v));}
@@ -431,6 +513,7 @@ function openPanel(el){
 function closePanel(){
   if(raf){cancelAnimationFrame(raf);raf=null;}
   document.getElementById("panel").classList.remove("show");
+  document.getElementById("compare-card").classList.remove("show");
   document.querySelectorAll(".cell.sel").forEach(c=>{c.classList.remove("sel");c.style.borderColor="";});
 }
 
@@ -523,6 +606,11 @@ document.querySelectorAll(".lb").forEach(btn=>{
     applyLayerColors();
     updateLayerNote();
   });
+});
+document.getElementById("compare-toggle").addEventListener("click",function(){
+  compareMode=!compareMode;
+  this.classList.toggle("active",compareMode);
+  if(!compareMode){compareSelection=[];renderCompareCard();}
 });
 </script>
 </body>
