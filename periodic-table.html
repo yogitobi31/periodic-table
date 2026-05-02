@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>인터랙티브 주기율표</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#f5f5f3;--bg3:#eeece8;
+  --text:#1a1a18;--text2:#6b6b66;--text3:#9b9b96;
+  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.25);
+  --radius:8px;--radius-lg:12px;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1c1c1a;--bg2:#272724;--bg3:#202020;
+    --text:#f0ede8;--text2:#a0a09a;--text3:#6a6a65;
+    --border:rgba(255,255,255,0.10);--border2:rgba(255,255,255,0.22);
+  }
+}
+body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:100vh;padding:20px 12px 60px}
+header{max-width:1200px;margin:0 auto 18px}
+h1{font-size:20px;font-weight:500;margin-bottom:3px}
+.sub{font-size:13px;color:var(--text2)}
+#app{max-width:1200px;margin:0 auto}
+#controls{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;align-items:center}
+#search{flex:1;min-width:130px;max-width:190px;height:30px;font-size:12px;padding:0 10px;
+  border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);outline:none}
+#search:focus{border-color:#378ADD}
+.fb{height:27px;padding:0 9px;font-size:11px;border:0.5px solid var(--border2);border-radius:var(--radius);
+  background:var(--bg);color:var(--text2);cursor:pointer;transition:background 0.1s,color 0.1s}
+.fb:hover,.fb.active{background:var(--bg2);color:var(--text)}
+#legend{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.leg{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text2)}
+.leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+#grid{display:grid;grid-template-columns:repeat(18,1fr);gap:2px;margin-bottom:3px}
+.cell{aspect-ratio:1;border-radius:3px;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:1px;border:0.5px solid transparent;
+  transition:transform 0.1s,border-color 0.1s;min-width:0;-webkit-tap-highlight-color:transparent}
+.cell:hover{transform:scale(1.14);z-index:10;border-color:rgba(0,0,0,0.35)}
+.cell.sel{transform:scale(1.08);z-index:5;border-width:1.5px}
+.cell.dimmed{opacity:0.13}
+.cell .num{font-size:6px;opacity:0.6;line-height:1;pointer-events:none}
+.cell .sym{font-size:10px;font-weight:500;line-height:1.15;pointer-events:none}
+.cell .elname{font-size:5px;opacity:0.7;line-height:1;white-space:nowrap;overflow:hidden;max-width:100%;pointer-events:none}
+.blank{background:transparent!important;pointer-events:none;border:none!important}
+.srow{display:grid;grid-template-columns:repeat(18,1fr);gap:2px;margin-bottom:2px}
+.slbl{font-size:8px;color:var(--text3);grid-column:1/4;display:flex;align-items:center;justify-content:flex-end;padding-right:3px}
+#panel{margin-top:12px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px;display:none}
+#panel.show{display:block}
+#panel-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+#pbadge{width:62px;height:62px;border-radius:var(--radius);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;flex-shrink:0}
+#pbadge .psym{font-size:26px;font-weight:500;line-height:1}
+#pbadge .pnum{font-size:10px;opacity:0.7}
+#pinfo{flex:1;min-width:0}
+#pname{font-size:17px;font-weight:500;color:var(--text)}
+#pcat{font-size:12px;color:var(--text2);margin-top:2px}
+#pec{font-size:11px;color:var(--text3);margin-top:4px}
+#pclose{height:27px;padding:0 12px;font-size:11px;cursor:pointer;border:0.5px solid var(--border2);
+  border-radius:var(--radius);background:transparent;color:var(--text2);align-self:flex-start;flex-shrink:0}
+#pclose:hover{background:var(--bg2)}
+#stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:16px}
+.st{background:var(--bg2);border-radius:var(--radius);padding:8px 10px}
+.st-l{font-size:10px;color:var(--text2);margin-bottom:3px}
+.st-v{font-size:13px;font-weight:500;color:var(--text)}
+#canvas-wrap{display:flex;justify-content:center}
+canvas{display:block}
+footer{max-width:1200px;margin:28px auto 0;font-size:11px;color:var(--text3);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>인터랙티브 주기율표</h1>
+  <p class="sub">118개 원소 · 원소를 클릭하면 전자 배치 애니메이션을 볼 수 있습니다</p>
+</header>
+<div id="app">
+  <div id="controls">
+    <input id="search" type="text" placeholder="원소 검색 (이름, 기호, 번호)..." />
+    <button class="fb active" data-cat="all">전체</button>
+    <button class="fb" data-cat="nonmetal">비금속</button>
+    <button class="fb" data-cat="noble gas">비활성 기체</button>
+    <button class="fb" data-cat="alkali metal">알칼리 금속</button>
+    <button class="fb" data-cat="alkaline earth metal">알칼리 토금속</button>
+    <button class="fb" data-cat="metalloid">반금속</button>
+    <button class="fb" data-cat="transition metal">전이 금속</button>
+    <button class="fb" data-cat="post-transition metal">전이 후 금속</button>
+    <button class="fb" data-cat="lanthanide">란타넘족</button>
+    <button class="fb" data-cat="actinide">악티늄족</button>
+  </div>
+  <div id="legend"></div>
+  <div id="grid"></div>
+  <div id="series-area"></div>
+  <div id="panel">
+    <div id="panel-top">
+      <div id="pbadge"><span class="psym" id="psym"></span><span class="pnum" id="pnum"></span></div>
+      <div id="pinfo">
+        <div id="pname"></div>
+        <div id="pcat"></div>
+        <div id="pec"></div>
+      </div>
+      <button id="pclose" onclick="closePanel()">닫기</button>
+    </div>
+    <div id="stats">
+      <div class="st"><div class="st-l">원자 질량</div><div class="st-v" id="s-mass"></div></div>
+      <div class="st"><div class="st-l">상태 (실온)</div><div class="st-v" id="s-phase"></div></div>
+      <div class="st"><div class="st-l">전기음성도</div><div class="st-v" id="s-en"></div></div>
+      <div class="st"><div class="st-l">주기</div><div class="st-v" id="s-period"></div></div>
+      <div class="st"><div class="st-l">족</div><div class="st-v" id="s-group"></div></div>
+      <div class="st"><div class="st-l">전자 수</div><div class="st-v" id="s-ecount"></div></div>
+    </div>
+    <div id="canvas-wrap">
+      <canvas id="ecanvas" width="320" height="240"></canvas>
+    </div>
+  </div>
+</div>
+<footer>인터랙티브 주기율표 · 데이터 출처: IUPAC 2021</footer>
+
+<script>
+const CC={
+  "alkali metal":   {bg:"#FAECE7",text:"#4A1B0C",bd:"#D85A30"},
+  "alkaline earth metal":{bg:"#FAEEDA",text:"#412402",bd:"#BA7517"},
+  "transition metal":{bg:"#E6F1FB",text:"#042C53",bd:"#378ADD"},
+  "post-transition metal":{bg:"#EAF3DE",text:"#173404",bd:"#639922"},
+  "metalloid":      {bg:"#EEEDFE",text:"#26215C",bd:"#7F77DD"},
+  "nonmetal":       {bg:"#E1F5EE",text:"#04342C",bd:"#1D9E75"},
+  "noble gas":      {bg:"#FBEAF0",text:"#4B1528",bd:"#D4537E"},
+  "lanthanide":     {bg:"#F1EFE8",text:"#2C2C2A",bd:"#888780"},
+  "actinide":       {bg:"#FCEBEB",text:"#501313",bd:"#E24B4A"},
+  "unknown":        {bg:"#F1EFE8",text:"#2C2C2A",bd:"#B4B2A9"}
+};
+const CKR={"alkali metal":"알칼리 금속","alkaline earth metal":"알칼리 토금속","transition metal":"전이 금속","post-transition metal":"전이 후 금속","metalloid":"반금속","nonmetal":"비금속","noble gas":"비활성 기체","lanthanide":"란타넘족","actinide":"악티늄족","unknown":"미분류"};
+const PKR={"solid":"고체","liquid":"액체","gas":"기체","unknown":"불명"};
+
+const EL=[
+ {n:1,sym:"H",name:"수소",cat:"nonmetal",mass:"1.008",period:1,group:1,phase:"gas",ec:"1s¹",en:"2.20"},
+ {n:2,sym:"He",name:"헬륨",cat:"noble gas",mass:"4.003",period:1,group:18,phase:"gas",ec:"1s²",en:"-"},
+ {n:3,sym:"Li",name:"리튬",cat:"alkali metal",mass:"6.941",period:2,group:1,phase:"solid",ec:"[He]2s¹",en:"0.98"},
+ {n:4,sym:"Be",name:"베릴륨",cat:"alkaline earth metal",mass:"9.012",period:2,group:2,phase:"solid",ec:"[He]2s²",en:"1.57"},
+ {n:5,sym:"B",name:"붕소",cat:"metalloid",mass:"10.81",period:2,group:13,phase:"solid",ec:"[He]2s²2p¹",en:"2.04"},
+ {n:6,sym:"C",name:"탄소",cat:"nonmetal",mass:"12.01",period:2,group:14,phase:"solid",ec:"[He]2s²2p²",en:"2.55"},
+ {n:7,sym:"N",name:"질소",cat:"nonmetal",mass:"14.01",period:2,group:15,phase:"gas",ec:"[He]2s²2p³",en:"3.04"},
+ {n:8,sym:"O",name:"산소",cat:"nonmetal",mass:"16.00",period:2,group:16,phase:"gas",ec:"[He]2s²2p⁴",en:"3.44"},
+ {n:9,sym:"F",name:"플루오린",cat:"nonmetal",mass:"19.00",period:2,group:17,phase:"gas",ec:"[He]2s²2p⁵",en:"3.98"},
+ {n:10,sym:"Ne",name:"네온",cat:"noble gas",mass:"20.18",period:2,group:18,phase:"gas",ec:"[He]2s²2p⁶",en:"-"},
+ {n:11,sym:"Na",name:"나트륨",cat:"alkali metal",mass:"22.99",period:3,group:1,phase:"solid",ec:"[Ne]3s¹",en:"0.93"},
+ {n:12,sym:"Mg",name:"마그네슘",cat:"alkaline earth metal",mass:"24.31",period:3,group:2,phase:"solid",ec:"[Ne]3s²",en:"1.31"},
+ {n:13,sym:"Al",name:"알루미늄",cat:"post-transition metal",mass:"26.98",period:3,group:13,phase:"solid",ec:"[Ne]3s²3p¹",en:"1.61"},
+ {n:14,sym:"Si",name:"규소",cat:"metalloid",mass:"28.09",period:3,group:14,phase:"solid",ec:"[Ne]3s²3p²",en:"1.90"},
+ {n:15,sym:"P",name:"인",cat:"nonmetal",mass:"30.97",period:3,group:15,phase:"solid",ec:"[Ne]3s²3p³",en:"2.19"},
+ {n:16,sym:"S",name:"황",cat:"nonmetal",mass:"32.07",period:3,group:16,phase:"solid",ec:"[Ne]3s²3p⁴",en:"2.58"},
+ {n:17,sym:"Cl",name:"염소",cat:"nonmetal",mass:"35.45",period:3,group:17,phase:"gas",ec:"[Ne]3s²3p⁵",en:"3.16"},
+ {n:18,sym:"Ar",name:"아르곤",cat:"noble gas",mass:"39.95",period:3,group:18,phase:"gas",ec:"[Ne]3s²3p⁶",en:"-"},
+ {n:19,sym:"K",name:"칼륨",cat:"alkali metal",mass:"39.10",period:4,group:1,phase:"solid",ec:"[Ar]4s¹",en:"0.82"},
+ {n:20,sym:"Ca",name:"칼슘",cat:"alkaline earth metal",mass:"40.08",period:4,group:2,phase:"solid",ec:"[Ar]4s²",en:"1.00"},
+ {n:21,sym:"Sc",name:"스칸듐",cat:"transition metal",mass:"44.96",period:4,group:3,phase:"solid",ec:"[Ar]3d¹4s²",en:"1.36"},
+ {n:22,sym:"Ti",name:"타이타늄",cat:"transition metal",mass:"47.87",period:4,group:4,phase:"solid",ec:"[Ar]3d²4s²",en:"1.54"},
+ {n:23,sym:"V",name:"바나듐",cat:"transition metal",mass:"50.94",period:4,group:5,phase:"solid",ec:"[Ar]3d³4s²",en:"1.63"},
+ {n:24,sym:"Cr",name:"크로뮴",cat:"transition metal",mass:"52.00",period:4,group:6,phase:"solid",ec:"[Ar]3d⁵4s¹",en:"1.66"},
+ {n:25,sym:"Mn",name:"망가니즈",cat:"transition metal",mass:"54.94",period:4,group:7,phase:"solid",ec:"[Ar]3d⁵4s²",en:"1.55"},
+ {n:26,sym:"Fe",name:"철",cat:"transition metal",mass:"55.85",period:4,group:8,phase:"solid",ec:"[Ar]3d⁶4s²",en:"1.83"},
+ {n:27,sym:"Co",name:"코발트",cat:"transition metal",mass:"58.93",period:4,group:9,phase:"solid",ec:"[Ar]3d⁷4s²",en:"1.88"},
+ {n:28,sym:"Ni",name:"니켈",cat:"transition metal",mass:"58.69",period:4,group:10,phase:"solid",ec:"[Ar]3d⁸4s²",en:"1.91"},
+ {n:29,sym:"Cu",name:"구리",cat:"transition metal",mass:"63.55",period:4,group:11,phase:"solid",ec:"[Ar]3d¹⁰4s¹",en:"1.90"},
+ {n:30,sym:"Zn",name:"아연",cat:"transition metal",mass:"65.38",period:4,group:12,phase:"solid",ec:"[Ar]3d¹⁰4s²",en:"1.65"},
+ {n:31,sym:"Ga",name:"갈륨",cat:"post-transition metal",mass:"69.72",period:4,group:13,phase:"solid",ec:"[Ar]3d¹⁰4s²4p¹",en:"1.81"},
+ {n:32,sym:"Ge",name:"저마늄",cat:"metalloid",mass:"72.64",period:4,group:14,phase:"solid",ec:"[Ar]3d¹⁰4s²4p²",en:"2.01"},
+ {n:33,sym:"As",name:"비소",cat:"metalloid",mass:"74.92",period:4,group:15,phase:"solid",ec:"[Ar]3d¹⁰4s²4p³",en:"2.18"},
+ {n:34,sym:"Se",name:"셀레늄",cat:"nonmetal",mass:"78.96",period:4,group:16,phase:"solid",ec:"[Ar]3d¹⁰4s²4p⁴",en:"2.55"},
+ {n:35,sym:"Br",name:"브로민",cat:"nonmetal",mass:"79.90",period:4,group:17,phase:"liquid",ec:"[Ar]3d¹⁰4s²4p⁵",en:"2.96"},
+ {n:36,sym:"Kr",name:"크립톤",cat:"noble gas",mass:"83.80",period:4,group:18,phase:"gas",ec:"[Ar]3d¹⁰4s²4p⁶",en:"3.00"},
+ {n:37,sym:"Rb",name:"루비듐",cat:"alkali metal",mass:"85.47",period:5,group:1,phase:"solid",ec:"[Kr]5s¹",en:"0.82"},
+ {n:38,sym:"Sr",name:"스트론튬",cat:"alkaline earth metal",mass:"87.62",period:5,group:2,phase:"solid",ec:"[Kr]5s²",en:"0.95"},
+ {n:39,sym:"Y",name:"이트륨",cat:"transition metal",mass:"88.91",period:5,group:3,phase:"solid",ec:"[Kr]4d¹5s²",en:"1.22"},
+ {n:40,sym:"Zr",name:"지르코늄",cat:"transition metal",mass:"91.22",period:5,group:4,phase:"solid",ec:"[Kr]4d²5s²",en:"1.33"},
+ {n:41,sym:"Nb",name:"나이오븀",cat:"transition metal",mass:"92.91",period:5,group:5,phase:"solid",ec:"[Kr]4d⁴5s¹",en:"1.60"},
+ {n:42,sym:"Mo",name:"몰리브데넘",cat:"transition metal",mass:"95.96",period:5,group:6,phase:"solid",ec:"[Kr]4d⁵5s¹",en:"2.16"},
+ {n:43,sym:"Tc",name:"테크네튬",cat:"transition metal",mass:"(98)",period:5,group:7,phase:"solid",ec:"[Kr]4d⁵5s²",en:"1.90"},
+ {n:44,sym:"Ru",name:"루테늄",cat:"transition metal",mass:"101.1",period:5,group:8,phase:"solid",ec:"[Kr]4d⁷5s¹",en:"2.20"},
+ {n:45,sym:"Rh",name:"로듐",cat:"transition metal",mass:"102.9",period:5,group:9,phase:"solid",ec:"[Kr]4d⁸5s¹",en:"2.28"},
+ {n:46,sym:"Pd",name:"팔라듐",cat:"transition metal",mass:"106.4",period:5,group:10,phase:"solid",ec:"[Kr]4d¹⁰",en:"2.20"},
+ {n:47,sym:"Ag",name:"은",cat:"transition metal",mass:"107.9",period:5,group:11,phase:"solid",ec:"[Kr]4d¹⁰5s¹",en:"1.93"},
+ {n:48,sym:"Cd",name:"카드뮴",cat:"transition metal",mass:"112.4",period:5,group:12,phase:"solid",ec:"[Kr]4d¹⁰5s²",en:"1.69"},
+ {n:49,sym:"In",name:"인듐",cat:"post-transition metal",mass:"114.8",period:5,group:13,phase:"solid",ec:"[Kr]4d¹⁰5s²5p¹",en:"1.78"},
+ {n:50,sym:"Sn",name:"주석",cat:"post-transition metal",mass:"118.7",period:5,group:14,phase:"solid",ec:"[Kr]4d¹⁰5s²5p²",en:"1.96"},
+ {n:51,sym:"Sb",name:"안티모니",cat:"metalloid",mass:"121.8",period:5,group:15,phase:"solid",ec:"[Kr]4d¹⁰5s²5p³",en:"2.05"},
+ {n:52,sym:"Te",name:"텔루륨",cat:"metalloid",mass:"127.6",period:5,group:16,phase:"solid",ec:"[Kr]4d¹⁰5s²5p⁴",en:"2.10"},
+ {n:53,sym:"I",name:"아이오딘",cat:"nonmetal",mass:"126.9",period:5,group:17,phase:"solid",ec:"[Kr]4d¹⁰5s²5p⁵",en:"2.66"},
+ {n:54,sym:"Xe",name:"제논",cat:"noble gas",mass:"131.3",period:5,group:18,phase:"gas",ec:"[Kr]4d¹⁰5s²5p⁶",en:"2.60"},
+ {n:55,sym:"Cs",name:"세슘",cat:"alkali metal",mass:"132.9",period:6,group:1,phase:"solid",ec:"[Xe]6s¹",en:"0.79"},
+ {n:56,sym:"Ba",name:"바륨",cat:"alkaline earth metal",mass:"137.3",period:6,group:2,phase:"solid",ec:"[Xe]6s²",en:"0.89"},
+ {n:57,sym:"La",name:"란타넘",cat:"lanthanide",mass:"138.9",period:6,group:3,phase:"solid",ec:"[Xe]5d¹6s²",en:"1.10"},
+ {n:58,sym:"Ce",name:"세륨",cat:"lanthanide",mass:"140.1",period:9,group:4,phase:"solid",ec:"[Xe]4f¹5d¹6s²",en:"1.12"},
+ {n:59,sym:"Pr",name:"프라세오디뮴",cat:"lanthanide",mass:"140.9",period:9,group:5,phase:"solid",ec:"[Xe]4f³6s²",en:"1.13"},
+ {n:60,sym:"Nd",name:"네오디뮴",cat:"lanthanide",mass:"144.2",period:9,group:6,phase:"solid",ec:"[Xe]4f⁴6s²",en:"1.14"},
+ {n:61,sym:"Pm",name:"프로메튬",cat:"lanthanide",mass:"(145)",period:9,group:7,phase:"solid",ec:"[Xe]4f⁵6s²",en:"1.13"},
+ {n:62,sym:"Sm",name:"사마륨",cat:"lanthanide",mass:"150.4",period:9,group:8,phase:"solid",ec:"[Xe]4f⁶6s²",en:"1.17"},
+ {n:63,sym:"Eu",name:"유로퓸",cat:"lanthanide",mass:"152.0",period:9,group:9,phase:"solid",ec:"[Xe]4f⁷6s²",en:"1.20"},
+ {n:64,sym:"Gd",name:"가돌리늄",cat:"lanthanide",mass:"157.3",period:9,group:10,phase:"solid",ec:"[Xe]4f⁷5d¹6s²",en:"1.20"},
+ {n:65,sym:"Tb",name:"터븀",cat:"lanthanide",mass:"158.9",period:9,group:11,phase:"solid",ec:"[Xe]4f⁹6s²",en:"1.22"},
+ {n:66,sym:"Dy",name:"디스프로슘",cat:"lanthanide",mass:"162.5",period:9,group:12,phase:"solid",ec:"[Xe]4f¹⁰6s²",en:"1.23"},
+ {n:67,sym:"Ho",name:"홀뮴",cat:"lanthanide",mass:"164.9",period:9,group:13,phase:"solid",ec:"[Xe]4f¹¹6s²",en:"1.24"},
+ {n:68,sym:"Er",name:"어븀",cat:"lanthanide",mass:"167.3",period:9,group:14,phase:"solid",ec:"[Xe]4f¹²6s²",en:"1.24"},
+ {n:69,sym:"Tm",name:"툴륨",cat:"lanthanide",mass:"168.9",period:9,group:15,phase:"solid",ec:"[Xe]4f¹³6s²",en:"1.25"},
+ {n:70,sym:"Yb",name:"이터븀",cat:"lanthanide",mass:"173.1",period:9,group:16,phase:"solid",ec:"[Xe]4f¹⁴6s²",en:"1.10"},
+ {n:71,sym:"Lu",name:"루테튬",cat:"lanthanide",mass:"175.0",period:9,group:17,phase:"solid",ec:"[Xe]4f¹⁴5d¹6s²",en:"1.27"},
+ {n:72,sym:"Hf",name:"하프늄",cat:"transition metal",mass:"178.5",period:6,group:4,phase:"solid",ec:"[Xe]4f¹⁴5d²6s²",en:"1.30"},
+ {n:73,sym:"Ta",name:"탄탈럼",cat:"transition metal",mass:"180.9",period:6,group:5,phase:"solid",ec:"[Xe]4f¹⁴5d³6s²",en:"1.50"},
+ {n:74,sym:"W",name:"텅스텐",cat:"transition metal",mass:"183.8",period:6,group:6,phase:"solid",ec:"[Xe]4f¹⁴5d⁴6s²",en:"2.36"},
+ {n:75,sym:"Re",name:"레늄",cat:"transition metal",mass:"186.2",period:6,group:7,phase:"solid",ec:"[Xe]4f¹⁴5d⁵6s²",en:"1.90"},
+ {n:76,sym:"Os",name:"오스뮴",cat:"transition metal",mass:"190.2",period:6,group:8,phase:"solid",ec:"[Xe]4f¹⁴5d⁶6s²",en:"2.20"},
+ {n:77,sym:"Ir",name:"이리듐",cat:"transition metal",mass:"192.2",period:6,group:9,phase:"solid",ec:"[Xe]4f¹⁴5d⁷6s²",en:"2.20"},
+ {n:78,sym:"Pt",name:"백금",cat:"transition metal",mass:"195.1",period:6,group:10,phase:"solid",ec:"[Xe]4f¹⁴5d⁹6s¹",en:"2.28"},
+ {n:79,sym:"Au",name:"금",cat:"transition metal",mass:"197.0",period:6,group:11,phase:"solid",ec:"[Xe]4f¹⁴5d¹⁰6s¹",en:"2.54"},
+ {n:80,sym:"Hg",name:"수은",cat:"transition metal",mass:"200.6",period:6,group:12,phase:"liquid",ec:"[Xe]4f¹⁴5d¹⁰6s²",en:"2.00"},
+ {n:81,sym:"Tl",name:"탈륨",cat:"post-transition metal",mass:"204.4",period:6,group:13,phase:"solid",ec:"[Xe]4f¹⁴5d¹⁰6s²6p¹",en:"1.62"},
+ {n:82,sym:"Pb",name:"납",cat:"post-transition metal",mass:"207.2",period:6,group:14,phase:"solid",ec:"[Xe]4f¹⁴5d¹⁰6s²6p²",en:"2.33"},
+ {n:83,sym:"Bi",name:"비스무트",cat:"post-transition metal",mass:"209.0",period:6,group:15,phase:"solid",ec:"[Xe]4f¹⁴5d¹⁰6s²6p³",en:"2.02"},
+ {n:84,sym:"Po",name:"폴로늄",cat:"post-transition metal",mass:"(209)",period:6,group:16,phase:"solid",ec:"[Xe]4f¹⁴5d¹⁰6s²6p⁴",en:"2.00"},
+ {n:85,sym:"At",name:"아스타틴",cat:"metalloid",mass:"(210)",period:6,group:17,phase:"solid",ec:"[Xe]4f¹⁴5d¹⁰6s²6p⁵",en:"2.20"},
+ {n:86,sym:"Rn",name:"라돈",cat:"noble gas",mass:"(222)",period:6,group:18,phase:"gas",ec:"[Xe]4f¹⁴5d¹⁰6s²6p⁶",en:"-"},
+ {n:87,sym:"Fr",name:"프랑슘",cat:"alkali metal",mass:"(223)",period:7,group:1,phase:"solid",ec:"[Rn]7s¹",en:"0.70"},
+ {n:88,sym:"Ra",name:"라듐",cat:"alkaline earth metal",mass:"(226)",period:7,group:2,phase:"solid",ec:"[Rn]7s²",en:"0.90"},
+ {n:89,sym:"Ac",name:"악티늄",cat:"actinide",mass:"(227)",period:7,group:3,phase:"solid",ec:"[Rn]6d¹7s²",en:"1.10"},
+ {n:90,sym:"Th",name:"토륨",cat:"actinide",mass:"232.0",period:10,group:4,phase:"solid",ec:"[Rn]6d²7s²",en:"1.30"},
+ {n:91,sym:"Pa",name:"프로트악티늄",cat:"actinide",mass:"231.0",period:10,group:5,phase:"solid",ec:"[Rn]5f²6d¹7s²",en:"1.50"},
+ {n:92,sym:"U",name:"우라늄",cat:"actinide",mass:"238.0",period:10,group:6,phase:"solid",ec:"[Rn]5f³6d¹7s²",en:"1.38"},
+ {n:93,sym:"Np",name:"넵투늄",cat:"actinide",mass:"(237)",period:10,group:7,phase:"solid",ec:"[Rn]5f⁴6d¹7s²",en:"1.36"},
+ {n:94,sym:"Pu",name:"플루토늄",cat:"actinide",mass:"(244)",period:10,group:8,phase:"solid",ec:"[Rn]5f⁶7s²",en:"1.28"},
+ {n:95,sym:"Am",name:"아메리슘",cat:"actinide",mass:"(243)",period:10,group:9,phase:"solid",ec:"[Rn]5f⁷7s²",en:"1.30"},
+ {n:96,sym:"Cm",name:"퀴륨",cat:"actinide",mass:"(247)",period:10,group:10,phase:"solid",ec:"[Rn]5f⁷6d¹7s²",en:"1.30"},
+ {n:97,sym:"Bk",name:"버클륨",cat:"actinide",mass:"(247)",period:10,group:11,phase:"solid",ec:"[Rn]5f⁹7s²",en:"1.30"},
+ {n:98,sym:"Cf",name:"캘리포늄",cat:"actinide",mass:"(251)",period:10,group:12,phase:"solid",ec:"[Rn]5f¹⁰7s²",en:"1.30"},
+ {n:99,sym:"Es",name:"아인슈타이늄",cat:"actinide",mass:"(252)",period:10,group:13,phase:"solid",ec:"[Rn]5f¹¹7s²",en:"1.30"},
+ {n:100,sym:"Fm",name:"페르뮴",cat:"actinide",mass:"(257)",period:10,group:14,phase:"solid",ec:"[Rn]5f¹²7s²",en:"1.30"},
+ {n:101,sym:"Md",name:"멘델레븀",cat:"actinide",mass:"(258)",period:10,group:15,phase:"solid",ec:"[Rn]5f¹³7s²",en:"1.30"},
+ {n:102,sym:"No",name:"노벨륨",cat:"actinide",mass:"(259)",period:10,group:16,phase:"solid",ec:"[Rn]5f¹⁴7s²",en:"1.30"},
+ {n:103,sym:"Lr",name:"로렌슘",cat:"actinide",mass:"(262)",period:10,group:17,phase:"solid",ec:"[Rn]5f¹⁴7s²7p¹",en:"1.30"},
+ {n:104,sym:"Rf",name:"러더포듐",cat:"transition metal",mass:"(265)",period:7,group:4,phase:"solid",ec:"[Rn]5f¹⁴6d²7s²",en:"-"},
+ {n:105,sym:"Db",name:"더브늄",cat:"transition metal",mass:"(268)",period:7,group:5,phase:"solid",ec:"[Rn]5f¹⁴6d³7s²",en:"-"},
+ {n:106,sym:"Sg",name:"시보귬",cat:"transition metal",mass:"(271)",period:7,group:6,phase:"solid",ec:"[Rn]5f¹⁴6d⁴7s²",en:"-"},
+ {n:107,sym:"Bh",name:"보륨",cat:"transition metal",mass:"(270)",period:7,group:7,phase:"solid",ec:"[Rn]5f¹⁴6d⁵7s²",en:"-"},
+ {n:108,sym:"Hs",name:"하슘",cat:"transition metal",mass:"(277)",period:7,group:8,phase:"solid",ec:"[Rn]5f¹⁴6d⁶7s²",en:"-"},
+ {n:109,sym:"Mt",name:"마이트너륨",cat:"unknown",mass:"(276)",period:7,group:9,phase:"unknown",ec:"[Rn]5f¹⁴6d⁷7s²",en:"-"},
+ {n:110,sym:"Ds",name:"다름슈타튬",cat:"unknown",mass:"(281)",period:7,group:10,phase:"unknown",ec:"[Rn]5f¹⁴6d⁸7s²",en:"-"},
+ {n:111,sym:"Rg",name:"뢴트게늄",cat:"unknown",mass:"(282)",period:7,group:11,phase:"unknown",ec:"[Rn]5f¹⁴6d⁹7s²",en:"-"},
+ {n:112,sym:"Cn",name:"코페르니슘",cat:"transition metal",mass:"(285)",period:7,group:12,phase:"unknown",ec:"[Rn]5f¹⁴6d¹⁰7s²",en:"-"},
+ {n:113,sym:"Nh",name:"니호늄",cat:"unknown",mass:"(286)",period:7,group:13,phase:"unknown",ec:"[Rn]5f¹⁴6d¹⁰7s²7p¹",en:"-"},
+ {n:114,sym:"Fl",name:"플레로븀",cat:"unknown",mass:"(289)",period:7,group:14,phase:"unknown",ec:"[Rn]5f¹⁴6d¹⁰7s²7p²",en:"-"},
+ {n:115,sym:"Mc",name:"모스코븀",cat:"unknown",mass:"(290)",period:7,group:15,phase:"unknown",ec:"[Rn]5f¹⁴6d¹⁰7s²7p³",en:"-"},
+ {n:116,sym:"Lv",name:"리버모륨",cat:"unknown",mass:"(293)",period:7,group:16,phase:"unknown",ec:"[Rn]5f¹⁴6d¹⁰7s²7p⁴",en:"-"},
+ {n:117,sym:"Ts",name:"테네신",cat:"unknown",mass:"(294)",period:7,group:17,phase:"unknown",ec:"[Rn]5f¹⁴6d¹⁰7s²7p⁵",en:"-"},
+ {n:118,sym:"Og",name:"오가네손",cat:"noble gas",mass:"(294)",period:7,group:18,phase:"unknown",ec:"[Rn]5f¹⁴6d¹⁰7s²7p⁶",en:"-"},
+];
+
+let activeFilter="all", activeSearch="", raf=null;
+
+function gc(cat){return CC[cat]||CC["unknown"]}
+
+function shells(n){
+  const caps=[2,8,18,32,32,18,8];
+  const out=[];let r=n;
+  for(let i=0;i<caps.length&&r>0;i++){const p=Math.min(r,caps[i]);out.push(p);r-=p;}
+  return out;
+}
+
+function buildLegend(){
+  const ld=document.getElementById("legend");
+  Object.entries(CKR).forEach(([k,v])=>{
+    const c=gc(k);
+    const d=document.createElement("div");
+    d.className="leg";
+    d.innerHTML=`<div class="leg-dot" style="background:${c.bg};border:0.5px solid ${c.bd}"></div><span>${v}</span>`;
+    ld.appendChild(d);
+  });
+}
+
+function makeCell(el){
+  const c=gc(el.cat);
+  const div=document.createElement("div");
+  div.className="cell";
+  div.dataset.n=el.n;
+  div.style.cssText=`background:${c.bg};color:${c.text}`;
+  div.innerHTML=`<span class="num">${el.n}</span><span class="sym">${el.sym}</span><span class="elname">${el.name}</span>`;
+  div.addEventListener("click",function(){
+    const found=EL.find(e=>e.n===parseInt(this.dataset.n));
+    if(found)openPanel(found);
+  });
+  return div;
+}
+
+function buildGrid(){
+  const grid=document.getElementById("grid");
+  const map={};
+  EL.forEach(e=>{if(e.period<=7)map[`${e.period}-${e.group}`]=e;});
+  for(let r=1;r<=7;r++){
+    for(let g=1;g<=18;g++){
+      const el=map[`${r}-${g}`];
+      if(el){grid.appendChild(makeCell(el));}
+      else{const b=document.createElement("div");b.className="cell blank";grid.appendChild(b);}
+    }
+  }
+  const sa=document.getElementById("series-area");
+  ["lanthanide","actinide"].forEach((cat,i)=>{
+    const row=document.createElement("div");
+    row.className="srow";
+    const lbl=document.createElement("div");
+    lbl.className="slbl";
+    lbl.textContent=i===0?"57–71":"89–103";
+    row.appendChild(lbl);
+    EL.filter(e=>e.cat===cat).forEach(e=>row.appendChild(makeCell(e)));
+    sa.appendChild(row);
+  });
+}
+
+function applyFilter(){
+  document.querySelectorAll(".cell:not(.blank)").forEach(c=>{
+    const el=EL.find(e=>e.n===parseInt(c.dataset.n));
+    if(!el)return;
+    const cm=activeFilter==="all"||el.cat===activeFilter;
+    const q=activeSearch.toLowerCase();
+    const sm=!q||(el.name.toLowerCase().includes(q)||el.sym.toLowerCase().includes(q)||String(el.n).includes(q));
+    c.classList.toggle("dimmed",!(cm&&sm));
+  });
+}
+
+function openPanel(el){
+  if(raf){cancelAnimationFrame(raf);raf=null;}
+  document.querySelectorAll(".cell.sel").forEach(c=>{c.classList.remove("sel");c.style.borderColor="";});
+  const cell=document.querySelector(`.cell[data-n="${el.n}"]`);
+  const c=gc(el.cat);
+  if(cell){cell.style.borderColor=c.bd;cell.classList.add("sel");}
+  const badge=document.getElementById("pbadge");
+  badge.style.cssText=`background:${c.bg};color:${c.text};width:62px;height:62px;border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0`;
+  document.getElementById("psym").textContent=el.sym;
+  document.getElementById("pnum").textContent=el.n;
+  document.getElementById("pname").textContent=el.name;
+  document.getElementById("pcat").textContent=CKR[el.cat]||el.cat;
+  document.getElementById("pec").textContent="전자 배치: "+el.ec;
+  document.getElementById("s-mass").textContent=el.mass;
+  document.getElementById("s-phase").textContent=PKR[el.phase]||el.phase;
+  document.getElementById("s-en").textContent=el.en;
+  const pd=el.period<=7?el.period:(el.period===9?6:7);
+  document.getElementById("s-period").textContent=pd+"주기";
+  document.getElementById("s-group").textContent=el.group+"족";
+  document.getElementById("s-ecount").textContent=el.n+"개";
+  const panel=document.getElementById("panel");
+  panel.classList.add("show");
+  panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+  startAnim(el);
+}
+
+function closePanel(){
+  if(raf){cancelAnimationFrame(raf);raf=null;}
+  document.getElementById("panel").classList.remove("show");
+  document.querySelectorAll(".cell.sel").forEach(c=>{c.classList.remove("sel");c.style.borderColor="";});
+}
+
+function startAnim(el){
+  const sh=shells(el.n);
+  const canvas=document.getElementById("ecanvas");
+  const ctx=canvas.getContext("2d");
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
+  const ns=sh.length;
+  const minR=20,maxR=Math.min(cx,cy)-14;
+  const radii=sh.map((_,i)=>ns===1?minR+14:minR+(maxR-minR)*(i/(ns-1)));
+  const angles=sh.map((cnt,_)=>Array.from({length:cnt},(_,j)=>j*(2*Math.PI/cnt)));
+  const speeds=radii.map((_,i)=>0.022/(i*0.45+1));
+  const c=gc(el.cat);
+
+  function frame(t){
+    ctx.clearRect(0,0,W,H);
+    radii.forEach(r=>{
+      ctx.beginPath();ctx.arc(cx,cy,r,0,2*Math.PI);
+      ctx.strokeStyle="rgba(128,128,128,0.15)";ctx.lineWidth=1;ctx.stroke();
+    });
+    ctx.beginPath();ctx.arc(cx,cy,18,0,2*Math.PI);
+    ctx.fillStyle=c.bg;ctx.fill();
+    ctx.strokeStyle=c.bd;ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle=c.text;
+    ctx.font=`500 ${el.n>99?8:el.n>9?10:12}px ${getComputedStyle(document.body).fontFamily}`;
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(el.n,cx,cy);
+    sh.forEach((cnt,si)=>{
+      const r=radii[si];
+      for(let ei=0;ei<cnt;ei++){
+        const a=angles[si][ei]+t*speeds[si];
+        const ex=cx+r*Math.cos(a),ey=cy+r*Math.sin(a);
+        ctx.beginPath();ctx.arc(ex,ey,4.5,0,2*Math.PI);
+        ctx.fillStyle=c.bd;ctx.fill();
+      }
+      ctx.fillStyle="rgba(120,120,120,0.7)";
+      ctx.font=`9px ${getComputedStyle(document.body).fontFamily}`;
+      ctx.textAlign="left";ctx.textBaseline="middle";
+      const lx=cx+radii[si]+7;
+      const ly=cy+(ns>1?(si-(ns-1)/2)*14:0);
+      if(lx<W-4)ctx.fillText(cnt+"e⁻",lx,ly);
+    });
+    raf=requestAnimationFrame(frame);
+  }
+  raf=requestAnimationFrame(frame);
+}
+
+document.querySelectorAll(".fb").forEach(btn=>{
+  btn.addEventListener("click",function(){
+    document.querySelectorAll(".fb").forEach(b=>b.classList.remove("active"));
+    this.classList.add("active");
+    activeFilter=this.dataset.cat;
+    applyFilter();
+  });
+});
+document.getElementById("search").addEventListener("input",function(){
+  activeSearch=this.value.trim();
+  applyFilter();
+});
+
+buildLegend();
+buildGrid();
+</script>
+</body>
+</html>
