@@ -66,8 +66,9 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px}
 .st{background:var(--bg2);border-radius:var(--radius);padding:8px 10px}
 .st-l{font-size:10px;color:var(--text2);margin-bottom:3px}
 .st-v{font-size:13px;font-weight:500;color:var(--text)}
-#canvas-wrap{display:flex;justify-content:center}
-canvas{display:block}
+	#canvas-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+	#ecanvas{display:block;width:min(100%,420px);height:auto;aspect-ratio:4/3}
+	#shell-note{font-size:11px;color:var(--text2);text-align:center}
 footer{max-width:1200px;margin:28px auto 0;font-size:11px;color:var(--text3);text-align:center}
 </style>
 </head>
@@ -111,10 +112,11 @@ footer{max-width:1200px;margin:28px auto 0;font-size:11px;color:var(--text3);tex
       <div class="st"><div class="st-l">족</div><div class="st-v" id="s-group"></div></div>
       <div class="st"><div class="st-l">전자 수</div><div class="st-v" id="s-ecount"></div></div>
     </div>
-    <div id="canvas-wrap">
-      <canvas id="ecanvas" width="320" height="240"></canvas>
-    </div>
-  </div>
+	    <div id="canvas-wrap">
+	      <canvas id="ecanvas" width="320" height="240"></canvas>
+	      <div id="shell-note">전자껍질: - / 최외각 전자: -개</div>
+	    </div>
+	  </div>
 </div>
 <footer>인터랙티브 주기율표 · 데이터 출처: IUPAC 2021</footer>
 
@@ -346,6 +348,8 @@ function openPanel(el){
   document.getElementById("s-period").textContent=pd+"주기";
   document.getElementById("s-group").textContent=el.group+"족";
   document.getElementById("s-ecount").textContent=el.n+"개";
+  const sh=shells(el.n);
+  document.getElementById("shell-note").textContent=`전자껍질: ${sh.join(", ")} / 최외각 전자: ${sh[sh.length-1]}개`;
   const panel=document.getElementById("panel");
   panel.classList.add("show");
   panel.scrollIntoView({behavior:"smooth",block:"nearest"});
@@ -360,14 +364,21 @@ function closePanel(){
 
 function startAnim(el){
   const sh=shells(el.n);
+  const sNames=["K","L","M","N","O","P","Q"];
   const canvas=document.getElementById("ecanvas");
   const ctx=canvas.getContext("2d");
-  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
+  const dpr=Math.max(1,window.devicePixelRatio||1);
+  const cssW=Math.min(canvas.parentElement.clientWidth,420);
+  const cssH=cssW*0.75;
+  canvas.width=Math.round(cssW*dpr);
+  canvas.height=Math.round(cssH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const W=cssW,H=cssH,cx=W/2,cy=H/2;
   const ns=sh.length;
-  const minR=20,maxR=Math.min(cx,cy)-14;
+  const minR=Math.max(18,Math.min(W,H)*0.08),maxR=Math.min(cx,cy)-20;
   const radii=sh.map((_,i)=>ns===1?minR+14:minR+(maxR-minR)*(i/(ns-1)));
   const angles=sh.map((cnt,_)=>Array.from({length:cnt},(_,j)=>j*(2*Math.PI/cnt)));
-  const speeds=radii.map((_,i)=>0.022/(i*0.45+1));
+  const speeds=radii.map((_,i)=>(0.0008/(i*0.45+1))*((i%2===0)?1:-1));
   const c=gc(el.cat);
 
   function frame(t){
@@ -380,16 +391,27 @@ function startAnim(el){
     ctx.fillStyle=c.bg;ctx.fill();
     ctx.strokeStyle=c.bd;ctx.lineWidth=1.5;ctx.stroke();
     ctx.fillStyle=c.text;
-    ctx.font=`500 ${el.n>99?8:el.n>9?10:12}px ${getComputedStyle(document.body).fontFamily}`;
+    ctx.font=`600 ${el.n>99?8:el.n>9?10:12}px ${getComputedStyle(document.body).fontFamily}`;
     ctx.textAlign="center";ctx.textBaseline="middle";
-    ctx.fillText(el.n,cx,cy);
+    ctx.fillText(el.sym,cx,cy-5);
+    ctx.font=`500 9px ${getComputedStyle(document.body).fontFamily}`;
+    ctx.fillText(`Z=${el.n}`,cx,cy+7);
     sh.forEach((cnt,si)=>{
       const r=radii[si];
+      ctx.fillStyle="rgba(120,120,120,0.72)";
+      ctx.font=`10px ${getComputedStyle(document.body).fontFamily}`;
+      ctx.textAlign="left";ctx.textBaseline="middle";
+      ctx.fillText(sNames[si]||`n${si+1}`,cx+r+8,cy-8);
       for(let ei=0;ei<cnt;ei++){
         const a=angles[si][ei]+t*speeds[si];
         const ex=cx+r*Math.cos(a),ey=cy+r*Math.sin(a);
         ctx.beginPath();ctx.arc(ex,ey,4.5,0,2*Math.PI);
-        ctx.fillStyle=c.bd;ctx.fill();
+        const isValence=si===ns-1;
+        ctx.fillStyle=isValence?"#FFD76A":c.bd;
+        ctx.shadowColor=isValence?"rgba(255,215,106,0.7)":"transparent";
+        ctx.shadowBlur=isValence?8:0;
+        ctx.fill();
+        ctx.shadowBlur=0;
       }
       ctx.fillStyle="rgba(120,120,120,0.7)";
       ctx.font=`9px ${getComputedStyle(document.body).fontFamily}`;
