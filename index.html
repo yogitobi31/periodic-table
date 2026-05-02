@@ -32,6 +32,11 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px}
 .fb{height:27px;padding:0 9px;font-size:11px;border:0.5px solid var(--border2);border-radius:var(--radius);
   background:var(--bg);color:var(--text2);cursor:pointer;transition:background 0.1s,color 0.1s}
 .fb:hover,.fb.active{background:var(--bg2);color:var(--text)}
+#layer-controls{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px 0;align-items:center}
+.lb{height:24px;padding:0 8px;font-size:10px;border:0.5px solid var(--border2);border-radius:999px;
+  background:transparent;color:var(--text2);cursor:pointer;transition:background 0.1s,color 0.1s}
+.lb:hover,.lb.active{background:var(--bg2);color:var(--text)}
+#layer-note{font-size:11px;color:var(--text2);min-height:16px;margin-bottom:8px}
 #legend{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
 .leg{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text2)}
 .leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
@@ -91,6 +96,15 @@ footer{max-width:1200px;margin:28px auto 0;font-size:11px;color:var(--text3);tex
     <button class="fb" data-cat="lanthanide">란타넘족</button>
     <button class="fb" data-cat="actinide">악티늄족</button>
   </div>
+  <div id="layer-controls">
+    <button class="lb active" data-layer="none">기본</button>
+    <button class="lb" data-layer="radius">원자 반지름</button>
+    <button class="lb" data-layer="en">전기음성도</button>
+    <button class="lb" data-layer="ionization">이온화 에너지</button>
+    <button class="lb" data-layer="metallicity">금속성</button>
+    <button class="lb" data-layer="valence">최외각 전자</button>
+  </div>
+  <div id="layer-note">기본: 기존 원소 분류 색상을 표시합니다.</div>
   <div id="legend"></div>
   <div id="grid"></div>
   <div id="series-area"></div>
@@ -257,7 +271,7 @@ const EL=[
  {n:118,sym:"Og",name:"오가네손",cat:"noble gas",mass:"(294)",period:7,group:18,phase:"unknown",ec:"[Rn]5f¹⁴6d¹⁰7s²7p⁶",en:"-"},
 ];
 
-let activeFilter="all", activeSearch="", raf=null;
+let activeFilter="all", activeSearch="", activeLayer="none", raf=null;
 
 function gc(cat){return CC[cat]||CC["unknown"]}
 
@@ -280,17 +294,75 @@ function buildLegend(){
 }
 
 function makeCell(el){
-  const c=gc(el.cat);
   const div=document.createElement("div");
   div.className="cell";
   div.dataset.n=el.n;
-  div.style.cssText=`background:${c.bg};color:${c.text}`;
+  const c=gc(el.cat);
+  div.style.color=c.text;
   div.innerHTML=`<span class="num">${el.n}</span><span class="sym">${el.sym}</span><span class="elname">${el.name}</span>`;
   div.addEventListener("click",function(){
     const found=EL.find(e=>e.n===parseInt(this.dataset.n));
     if(found)openPanel(found);
   });
   return div;
+}
+
+function clamp01(v){return Math.max(0,Math.min(1,v));}
+function mix(v,min,max){if(max===min)return 0;return clamp01((v-min)/(max-min));}
+function valenceElectrons(el){
+  if(el.group>=1&&el.group<=2)return el.group;
+  if(el.group>=13&&el.group<=18)return el.group-10;
+  const sh=shells(el.n);
+  return sh[sh.length-1];
+}
+function trendScore(el){
+  const p=el.period<=7?el.period:(el.period===9?6:7);
+  const g=el.group;
+  if(activeLayer==="none")return null;
+  if(activeLayer==="en"){
+    const en=parseFloat(el.en);
+    if(!Number.isNaN(en))return mix(en,0.7,4.0);
+    return mix((g/18)+(1-p/7),0.2,1.9);
+  }
+  if(activeLayer==="radius")return mix((p/7)+(1-g/18),0.2,1.9);
+  if(activeLayer==="ionization")return mix((g/18)+(1-p/7),0.2,1.9);
+  if(activeLayer==="metallicity")return mix((p/7)+(1-g/18),0.2,1.9);
+  if(activeLayer==="valence")return mix(valenceElectrons(el),1,8);
+  return null;
+}
+function layerColor(){
+  if(activeLayer==="radius"||activeLayer==="metallicity")return [255,168,76];
+  if(activeLayer==="en"||activeLayer==="ionization")return [73,146,245];
+  if(activeLayer==="valence")return [138,110,232];
+  return [255,255,255];
+}
+function applyLayerColors(){
+  const rgb=layerColor();
+  document.querySelectorAll(".cell:not(.blank)").forEach(c=>{
+    const el=EL.find(e=>e.n===parseInt(c.dataset.n));
+    if(!el)return;
+    const cc=gc(el.cat);
+    const score=trendScore(el);
+    if(score===null){
+      c.style.background=cc.bg;
+      c.style.color=cc.text;
+      return;
+    }
+    const alpha=(0.05+score*0.28).toFixed(3);
+    c.style.background=`linear-gradient(rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha}),rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha})),${cc.bg}`;
+    c.style.color=cc.text;
+  });
+}
+function updateLayerNote(){
+  const notes={
+    none:"기본: 기존 원소 분류 색상을 표시합니다.",
+    en:"전기음성도: 오른쪽 위로 갈수록 대체로 커집니다.",
+    radius:"원자 반지름: 왼쪽 아래로 갈수록 대체로 커집니다.",
+    ionization:"이온화 에너지: 오른쪽 위로 갈수록 대체로 커집니다.",
+    metallicity:"금속성: 왼쪽 아래로 갈수록 대체로 강해집니다.",
+    valence:"최외각 전자: 같은 족 원소들은 비슷한 최외각 전자 수를 가집니다."
+  };
+  document.getElementById("layer-note").textContent=notes[activeLayer]||notes.none;
 }
 
 function buildGrid(){
@@ -440,6 +512,18 @@ document.getElementById("search").addEventListener("input",function(){
 
 buildLegend();
 buildGrid();
+applyLayerColors();
+updateLayerNote();
+
+document.querySelectorAll(".lb").forEach(btn=>{
+  btn.addEventListener("click",function(){
+    document.querySelectorAll(".lb").forEach(b=>b.classList.remove("active"));
+    this.classList.add("active");
+    activeLayer=this.dataset.layer;
+    applyLayerColors();
+    updateLayerNote();
+  });
+});
 </script>
 </body>
 </html>
