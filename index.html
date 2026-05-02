@@ -46,6 +46,10 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 .lb:hover,.lb.active{background:var(--bg2);color:var(--text)}
 #layer-note{font-size:11px;color:var(--text2);min-height:16px;margin-bottom:8px}
 #mode-note{font-size:10px;color:var(--text2);min-height:14px;margin:0 0 8px 2px;line-height:1.4}
+#master-study-controls{display:none;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 8px 2px}
+#master-study-controls.show{display:flex}
+.cell.hide-name .elname{visibility:hidden}
+.cell.hide-sym .sym{visibility:hidden}
 #legend{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
 .leg{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text2)}
 .leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
@@ -147,8 +151,14 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
     <button class="fb" data-cat="actinide">악티늄족</button>
     <button class="fb" id="relation-toggle">같은 족·주기 보기</button>
     <button class="fb" id="compare-toggle">두 원소 비교</button>
+    <button class="fb" id="master-toggle">1~20 원소 마스터</button>
   </div>
   <div id="mode-note"></div>
+  <div id="master-study-controls">
+    <button class="lb active" data-master-view="all">전체 보기</button>
+    <button class="lb" data-master-view="hide-name">이름 가리기</button>
+    <button class="lb" data-master-view="hide-sym">기호 가리기</button>
+  </div>
   <div id="layer-controls">
     <button class="lb active" data-layer="none">기본</button>
     <button class="lb" data-layer="radius">원자 반지름</button>
@@ -356,6 +366,7 @@ const EL=[
 let activeFilter="all", activeSearch="", activeLayer="none", raf=null;
 let compareMode=false, compareSelection=[];
 let relationMode=false, selectedElementN=null;
+let masterMode=false, masterViewMode="all";
 
 const EXAMPLES={
   "Cl-Na":"Na + Cl → NaCl",
@@ -542,6 +553,19 @@ function applyFilter(){
     const sm=!q||(el.name.toLowerCase().includes(q)||el.sym.toLowerCase().includes(q)||String(el.n).includes(q));
     c.classList.toggle("dimmed",!(cm&&sm));
   });
+  applyMasterModeStyles();
+}
+function applyMasterModeStyles(){
+  document.querySelectorAll(".cell:not(.blank)").forEach(c=>{
+    const el=EL.find(e=>e.n===parseInt(c.dataset.n));
+    if(!el)return;
+    c.classList.remove("hide-name","hide-sym");
+    if(masterMode){
+      if(el.n>20)c.classList.add("dimmed");
+      if(el.n<=20&&masterViewMode==="hide-name")c.classList.add("hide-name");
+      if(el.n<=20&&masterViewMode==="hide-sym")c.classList.add("hide-sym");
+    }
+  });
 }
 function clearRelationshipHighlight(){
   document.querySelectorAll(".cell.rel-group,.cell.rel-period,.cell.rel-focus").forEach(c=>{
@@ -700,7 +724,18 @@ function updateModeNote(){
     note.textContent="선택한 원소와 같은 족, 같은 주기의 원소를 은은하게 강조합니다.";
     return;
   }
+  if(masterMode){
+    note.textContent="1~20번 원소를 집중해서 익히는 모드입니다.";
+    return;
+  }
   note.textContent="";
+}
+function updateMasterControls(){
+  const wrap=document.getElementById("master-study-controls");
+  wrap.classList.toggle("show",masterMode);
+  wrap.querySelectorAll(".lb[data-master-view]").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.masterView===masterViewMode);
+  });
 }
 
 buildLegend();
@@ -708,6 +743,7 @@ buildGrid();
 applyLayerColors();
 updateLayerNote();
 updateModeNote();
+updateMasterControls();
 
 document.querySelectorAll(".lb").forEach(btn=>{
   btn.addEventListener("click",function(){
@@ -736,6 +772,21 @@ document.getElementById("relation-toggle").addEventListener("click",function(){
     document.getElementById("relation-note").innerHTML="";
   }
   updateModeNote();
+});
+document.getElementById("master-toggle").addEventListener("click",function(){
+  masterMode=!masterMode;
+  this.classList.toggle("active",masterMode);
+  if(!masterMode)masterViewMode="all";
+  applyFilter();
+  updateModeNote();
+  updateMasterControls();
+});
+document.querySelectorAll(".lb[data-master-view]").forEach(btn=>{
+  btn.addEventListener("click",function(){
+    masterViewMode=this.dataset.masterView;
+    applyMasterModeStyles();
+    updateMasterControls();
+  });
 });
 </script>
 </body>
