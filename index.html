@@ -94,6 +94,9 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 #story-card{margin-top:10px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
 .story-title{font-size:11px;color:var(--panel-muted);margin-bottom:5px}
 #story-text{font-size:12px;color:var(--panel-text);line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
+#memory-card{margin-top:8px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
+.memory-title{font-size:11px;color:var(--panel-muted);margin-bottom:5px}
+#memory-text{font-size:12px;color:var(--panel-text);line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
 #compare-card{display:none;margin-top:14px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
 #compare-card.show{display:block}
 .cmp-title{font-size:11px;color:var(--panel-muted);margin-bottom:7px}
@@ -198,6 +201,7 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
         <div class="story-title">원소 이야기</div>
         <div id="story-text">이 원소의 이야기는 준비 중입니다.</div>
       </div>
+      <div id="memory-card"><div class="memory-title">기억 포인트</div><div id="memory-text">이 원소의 기억 포인트는 준비 중입니다.</div></div>
       <div id="compare-card"></div>
       <div id="relation-note" style="margin-top:10px;font-size:11px;color:var(--panel-muted);line-height:1.5"></div>
 	  </div>
@@ -344,6 +348,28 @@ const ELEMENT_STORIES={
   116:"리버모륨은 무거운 원자핵의 붕괴 연쇄를 연구할 때 중요한 표지 원소입니다. 매우 불안정해 실험실 밖 활용은 없습니다.",
   117:"테네신은 할로젠 족에 놓이지만 성질이 일반 할로젠과 다를 것으로 예상되는 초중원소입니다. 현재는 합성·붕괴 데이터로 성질을 추정하는 단계입니다.",
   118:"오가네손은 현재 알려진 가장 무거운 원소로, 극도로 불안정해 아주 짧게만 존재합니다. 실용적 용도는 없고 원자핵 안정성의 한계를 시험하는 연구 대상입니다."
+};
+const MEMORY_POINTS={
+  1:"H는 가장 가벼운 원소, 별의 연료.",
+  2:"He는 거의 반응하지 않는 가벼운 기체, 풍선을 떠올리면 된다.",
+  3:"Li는 가벼운 금속, 배터리의 핵심 재료.",
+  4:"Be는 가볍고 단단해 항공 소재에 쓰인다.",
+  5:"B는 유리·세제에도 쓰이는 대표 반금속.",
+  6:"C는 생명과 유기물의 뼈대.",
+  7:"N은 공기의 대부분을 차지하는 기체.",
+  8:"O는 호흡, 연소, 물을 떠올리면 된다.",
+  9:"F는 반응성이 매우 큰 할로젠.",
+  10:"Ne는 반응이 거의 없고 네온사인으로 유명.",
+  11:"Na는 활발한 알칼리 금속, 소금의 한 성분.",
+  12:"Mg는 가볍고 밝게 타며 몸에도 필요한 원소.",
+  13:"Al은 가볍고 잘 녹슬지 않는 생활 금속.",
+  14:"Si는 반도체 칩과 모래·유리의 핵심 성분.",
+  15:"P는 DNA와 ATP에 들어가는 생명 필수 원소.",
+  16:"S는 단백질 구조 안정에 중요한 노란 원소.",
+  17:"Cl은 소독과 소금으로 기억하기 좋은 할로젠.",
+  18:"Ar은 거의 반응하지 않아 보호 기체로 쓰인다.",
+  19:"K는 신경 신호와 근육 수축에 중요한 이온.",
+  20:"Ca는 뼈와 치아를 단단하게 만드는 원소."
 };
 
 const EL=[
@@ -726,6 +752,7 @@ function openPanel(el){
   const rNote=document.getElementById("relation-note");
   rNote.innerHTML=relationMode?relationDescription(el):"";
   document.getElementById("story-text").textContent=ELEMENT_STORIES[el.n]||"이 원소의 이야기는 준비 중입니다.";
+  document.getElementById("memory-text").textContent=MEMORY_POINTS[el.n]||"이 원소의 기억 포인트는 준비 중입니다.";
   selectedElementN=el.n;
   applyRelationshipHighlight(el);
   const sh=shells(el.n);
