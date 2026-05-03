@@ -152,6 +152,7 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
     <button class="fb" id="relation-toggle">같은 족·주기 보기</button>
     <button class="fb" id="compare-toggle">두 원소 비교</button>
     <button class="fb" id="master-toggle">1~20 원소 마스터</button>
+    <button class="fb" id="random-element">랜덤 원소</button>
   </div>
   <div id="mode-note"></div>
   <div id="master-study-controls">
@@ -498,6 +499,14 @@ function buildLegend(){
   });
 }
 
+function handleElementSelection(el){
+  if(compareMode){
+    handleCompareSelect(el);
+    return;
+  }
+  openPanel(el);
+}
+
 function makeCell(el){
   const div=document.createElement("div");
   div.className="cell";
@@ -508,11 +517,7 @@ function makeCell(el){
   div.addEventListener("click",function(){
     const found=EL.find(e=>e.n===parseInt(this.dataset.n));
     if(!found)return;
-    if(compareMode){
-      handleCompareSelect(found);
-      return;
-    }
-    openPanel(found);
+    handleElementSelection(found);
   });
   return div;
 }
@@ -815,6 +820,11 @@ document.querySelectorAll(".fb[data-cat]").forEach(btn=>{
 document.getElementById("search").addEventListener("input",function(){
   activeSearch=this.value.trim();
   applyFilter();
+});
+document.getElementById("random-element").addEventListener("click",function(){
+  const randomElement=EL[Math.floor(Math.random()*EL.length)];
+  if(!randomElement)return;
+  handleElementSelection(randomElement);
 });
 
 function updateModeNote(){
