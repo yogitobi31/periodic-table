@@ -104,20 +104,32 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 .obj-soft{fill:rgba(255,255,255,0.35);stroke:rgba(42,42,38,0.2);stroke-width:1}
 .obj-highlight{fill:none;stroke:rgba(255,255,255,0.52);stroke-width:1.2}
 .obj-metal{fill:none;stroke:rgba(255,255,255,0.48);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.2}
+.obj-he-body{fill:#f2ede2;stroke:#9f9588;stroke-width:1}
+.obj-he-gloss{fill:none;stroke:rgba(255,255,255,0.78);stroke-width:1.3}
+.obj-ne-tube{fill:none;stroke:#a17f87;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.obj-ne-glow{fill:none;stroke:#be9aa1;stroke-width:5.6;stroke-linecap:round;stroke-linejoin:round;opacity:.28;filter:blur(.3px)}
+.obj-si-body{fill:#d7dde2;stroke:#7b858f;stroke-width:1}
+.obj-si-path{fill:none;stroke:#7f8993;stroke-width:1.15;stroke-linecap:round;stroke-linejoin:round}
+.obj-si-signal{fill:none;stroke:#cfd6dc;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+.obj-cu-wire{fill:none;stroke:#977867;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.obj-cu-sheen{fill:none;stroke:#ccb09d;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.14}
+.obj-au-ring{fill:none;stroke:#a58c62;stroke-width:4.2;stroke-linecap:round;stroke-linejoin:round}
+.obj-au-inner{fill:none;stroke:#cab792;stroke-width:1.3;opacity:.52}
+.obj-au-sweep{fill:none;stroke:#e1d2b5;stroke-width:1.9;opacity:.16;stroke-linecap:round;stroke-linejoin:round}
 .anim-he-drift{transform-origin:90px 30px;animation:heDrift 5.6s ease-in-out infinite}
 .anim-he-string{transform-origin:92px 44px;animation:heString 5.6s ease-in-out infinite;animation-delay:.18s}
 .anim-neon-breathe{animation:neonBreathe 4.4s ease-in-out infinite}
-.anim-chip-trace{stroke-dasharray:11 40;stroke-dashoffset:54;animation:chipTrace 3.8s ease-in-out infinite}
-.anim-chip-trace-b{stroke-dasharray:8 32;stroke-dashoffset:40;animation:chipTraceB 4.2s ease-in-out infinite}
-.anim-wire-sheen{stroke-dasharray:20 66;stroke-dashoffset:78;animation:wireSheen 5.8s ease-in-out infinite}
-.anim-ring-sweep{stroke-dasharray:20 94;stroke-dashoffset:102;animation:ringSweep 5.2s ease-in-out infinite}
-@keyframes heDrift{0%,100%{transform:translate(0,0) rotate(-.28deg)}25%{transform:translate(1.2px,-1.3px) rotate(.2deg)}50%{transform:translate(-1.3px,-2.7px) rotate(-.24deg)}75%{transform:translate(.9px,-1.4px) rotate(.16deg)}}
-@keyframes heString{0%,100%{transform:translate(0,0) rotate(.03deg)}30%{transform:translate(-.62px,.22px) rotate(-.62deg)}55%{transform:translate(.82px,.38px) rotate(.74deg)}80%{transform:translate(-.45px,.2px) rotate(-.38deg)}}
-@keyframes neonBreathe{0%,100%{opacity:.34}42%{opacity:.68}70%{opacity:.54}}
-@keyframes chipTrace{0%{stroke-dashoffset:54;opacity:.18}32%{opacity:.48}72%{opacity:.62}100%{stroke-dashoffset:-14;opacity:.16}}
-@keyframes chipTraceB{0%{stroke-dashoffset:40;opacity:.1}36%{opacity:.36}68%{opacity:.5}100%{stroke-dashoffset:-12;opacity:.12}}
-@keyframes wireSheen{0%{stroke-dashoffset:78;opacity:.12}34%{opacity:.32}70%{opacity:.27}100%{stroke-dashoffset:-20;opacity:.1}}
-@keyframes ringSweep{0%{stroke-dashoffset:102;opacity:.1}40%{opacity:.36}72%{opacity:.28}100%{stroke-dashoffset:-16;opacity:.1}}
+.anim-chip-trace{stroke-dasharray:12 48;stroke-dashoffset:64;animation:chipTrace 3.7s ease-in-out infinite}
+.anim-chip-trace-b{stroke-dasharray:10 42;stroke-dashoffset:56;animation:chipTraceB 4.1s ease-in-out infinite}
+.anim-wire-sheen{stroke-dasharray:22 68;stroke-dashoffset:88;animation:wireSheen 5.6s ease-in-out infinite}
+.anim-ring-sweep{stroke-dasharray:24 88;stroke-dashoffset:94;animation:ringSweep 5.1s ease-in-out infinite}
+@keyframes heDrift{0%,100%{transform:translate(0,0) rotate(-.34deg)}25%{transform:translate(1.7px,-1.7px) rotate(.25deg)}50%{transform:translate(-1.8px,-3.4px) rotate(-.3deg)}75%{transform:translate(1.2px,-1.9px) rotate(.2deg)}}
+@keyframes heString{0%,100%{transform:translate(0,0) rotate(.04deg)}30%{transform:translate(-.8px,.35px) rotate(-1deg)}56%{transform:translate(1.05px,.5px) rotate(1.1deg)}82%{transform:translate(-.56px,.26px) rotate(-.52deg)}}
+@keyframes neonBreathe{0%,100%{opacity:.26}36%{opacity:.56}68%{opacity:.42}}
+@keyframes chipTrace{0%{stroke-dashoffset:64;opacity:.12}38%{opacity:.44}70%{opacity:.64}100%{stroke-dashoffset:-20;opacity:.12}}
+@keyframes chipTraceB{0%{stroke-dashoffset:56;opacity:.08}34%{opacity:.31}66%{opacity:.51}100%{stroke-dashoffset:-18;opacity:.1}}
+@keyframes wireSheen{0%{stroke-dashoffset:88;opacity:.1}34%{opacity:.3}68%{opacity:.34}100%{stroke-dashoffset:-14;opacity:.09}}
+@keyframes ringSweep{0%{stroke-dashoffset:94;opacity:.1}38%{opacity:.38}72%{opacity:.3}100%{stroke-dashoffset:-10;opacity:.1}}
 @media(prefers-reduced-motion:reduce){
   .anim-he-drift,.anim-he-string,.anim-neon-breathe,.anim-chip-trace,.anim-chip-trace-b,.anim-wire-sheen,.anim-ring-sweep{animation:none!important}
 }
@@ -300,17 +312,17 @@ const ELEMENT_OBJECTS={
 
 function objectSVG(type){
   if(type==="balloon")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="풍선">
-    <g class="anim-he-drift"><ellipse class="obj-soft" cx="90" cy="24.5" rx="13" ry="17.2"/><path class="obj-highlight" d="M84.2 16.8c1.8-2.4 4.1-3.7 6.8-3.8"/><path class="obj-core" d="M90 41.8c0 2.4 1.1 3.8 2.4 5.2"/></g><path class="obj-core anim-he-string" d="M92.2 46.4c1.5 2.8 2 5.7 1.6 9.2-.2 1.5-.7 2.9-1.3 4.4"/></svg>`;
+    <g class="anim-he-drift"><ellipse class="obj-he-body" cx="90" cy="23.8" rx="12.6" ry="16.8"/><path class="obj-he-gloss" d="M84.8 16.3c1.8-2.4 4.1-3.5 6.5-3.5"/><path class="obj-core" d="M90.2 40.9c0 2.2 1.1 3.5 2.4 4.8"/></g><path class="obj-core anim-he-string" d="M92.5 45.6c1.1 2.6 1.4 5.4.9 8.5-.2 1.5-.7 3-1.5 4.6"/></svg>`;
   if(type==="neon")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="네온사인">
-    <rect class="obj-soft" x="46" y="18" width="88" height="28" rx="6"/><path class="obj-core" d="M58 41V23l9.2 12.2V23m7.6 18V23h11.3m-11.3 9h10m8.8 9V23h2.6c4.9 0 7.6 2.9 7.6 8.8 0 6-2.7 9.2-7.6 9.2h-2.6"/><path class="obj-highlight anim-neon-breathe" d="M58 41V23l9.2 12.2V23m7.6 18V23h11.3m-11.3 9h10m8.8 9V23h2.6c4.9 0 7.6 2.9 7.6 8.8 0 6-2.7 9.2-7.6 9.2h-2.6"/></svg>`;
+    <rect class="obj-soft" x="47" y="16.5" width="86" height="31" rx="7"/><path class="obj-ne-glow anim-neon-breathe" d="M60 39V24.2l8.8 10.9V24.2m8.2 14.8V24.2h10.8m-10.8 7.4h9.8m8.4 7.4V24.2h7.9c4.6 0 7.4 2.8 7.4 7.4s-2.8 7.4-7.4 7.4h-7.9"/><path class="obj-ne-tube" d="M60 39V24.2l8.8 10.9V24.2m8.2 14.8V24.2h10.8m-10.8 7.4h9.8m8.4 7.4V24.2h7.9c4.6 0 7.4 2.8 7.4 7.4s-2.8 7.4-7.4 7.4h-7.9"/><path class="obj-highlight anim-neon-breathe" d="M60 39V24.2l8.8 10.9V24.2m8.2 14.8V24.2h10.8m-10.8 7.4h9.8m8.4 7.4V24.2h7.9c4.6 0 7.4 2.8 7.4 7.4s-2.8 7.4-7.4 7.4h-7.9"/></svg>`;
   if(type==="chip")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="반도체 칩">
-    <rect class="obj-soft" x="64" y="15" width="52" height="34" rx="5"/><rect class="obj-core" x="64" y="15" width="52" height="34" rx="5"/><rect class="obj-core" x="73" y="23" width="34" height="18" rx="2.6"/><path class="obj-core" d="M64 21h-6m6 7h-6m6 7h-6m6 7h-6m58-21h6m-6 7h6m-6 7h6m-6 7h6"/><path class="obj-core" d="M73 29h-10m44 0h10M90 23v-6m0 30v-6m-9-12h18"/><path class="obj-core" d="M74 38h12v-7h16m-7 10h13v-8h10"/>
-    <path class="obj-highlight anim-chip-trace" d="M74 38h12v-7h16"/><path class="obj-highlight anim-chip-trace-b" d="M95 41h13v-8h10"/></svg>`;
+    <rect class="obj-si-body" x="62" y="14.2" width="56" height="35.6" rx="5.4"/><rect class="obj-core" x="62" y="14.2" width="56" height="35.6" rx="5.4"/><rect class="obj-si-path" x="73" y="23" width="34" height="18.2" rx="2.4"/><path class="obj-core" d="M62 20h-6m6 6h-6m6 6h-6m6 6h-6m6 6h-6m62-24h6m-6 6h6m-6 6h6m-6 6h6m-6 6h6"/><path class="obj-si-path" d="M73 27h-9m43 0h9M90 23v-6m0 32v-6m-11-10h22"/><path class="obj-si-path" d="M75 37h12v-7h15m-8 10h14v-8h9"/>
+    <path class="obj-si-signal anim-chip-trace" d="M75 37h12v-7h15"/><path class="obj-si-signal anim-chip-trace-b" d="M94 40h14v-8h9"/></svg>`;
   if(type==="wire")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="감긴 전선">
-    <path class="obj-core" d="M40 40.8c0-9.8 9.8-17.6 21.8-17.6s21.8 7.8 21.8 17.6-9.8 17.6-21.8 17.6S40 50.6 40 40.8zm36.2 0c0-9.8 9.8-17.6 21.8-17.6s21.8 7.8 21.8 17.6-9.8 17.6-21.8 17.6-21.8-7.8-21.8-17.6zm36.2 0c0-9.8 9.8-17.6 21.8-17.6S156 31 156 40.8"/><path class="obj-metal anim-wire-sheen" d="M40 40.8c0-9.8 9.8-17.6 21.8-17.6s21.8 7.8 21.8 17.6-9.8 17.6-21.8 17.6m14.4-35c7 1.1 13.5 5.9 16.6 13.2m19.6-13.2c7 1.1 13.5 5.9 16.6 13.2"/></svg>`;
+    <path class="obj-cu-wire" d="M38 40.2c0-9.3 9.5-16.7 21.2-16.7s21.2 7.4 21.2 16.7-9.5 16.7-21.2 16.7S38 49.5 38 40.2zm34.4 0c0-9.3 9.5-16.7 21.2-16.7s21.2 7.4 21.2 16.7-9.5 16.7-21.2 16.7-21.2-7.4-21.2-16.7zm34.4 0c0-9.3 9.5-16.7 21.2-16.7S149 30.9 149 40.2"/><path class="obj-cu-sheen anim-wire-sheen" d="M38 40.2c0-9.3 9.5-16.7 21.2-16.7s21.2 7.4 21.2 16.7-9.5 16.7-21.2 16.7m13.9-33c6.8 1.1 13 5.7 16.2 12.8m18.9-12.8c6.8 1.1 13 5.7 16.2 12.8"/></svg>`;
   if(type==="ring")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="금반지">
-    <ellipse class="obj-soft" cx="90" cy="35.2" rx="27" ry="12.8"/><ellipse class="obj-core" cx="90" cy="35.2" rx="27" ry="12.8"/><ellipse class="obj-core" cx="90" cy="35.2" rx="20" ry="9"/><path class="obj-core" d="M67.6 34.5c4.8-5.4 15-8.8 22.4-8.8 8.7 0 18.4 3.7 22.4 9.2"/>
-    <path class="obj-metal anim-ring-sweep" d="M70.8 30.8c6.2-4.5 22-5.6 37.6-.8"/></svg>`;
+    <ellipse class="obj-au-ring" cx="90" cy="35.8" rx="26.4" ry="12.2" transform="rotate(-8 90 35.8)"/><ellipse class="obj-au-inner" cx="90" cy="35.8" rx="19.7" ry="8.6" transform="rotate(-8 90 35.8)"/><path class="obj-au-inner" d="M68.8 34.2c4.8-4.8 13.8-7.8 21.2-7.8 8.9 0 18.4 3.5 22.2 8.5"/>
+    <path class="obj-au-sweep anim-ring-sweep" d="M71.3 30.5c6.5-4.1 20.8-5.2 35.7-.9"/></svg>`;
   return "";
 }
 
