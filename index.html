@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>원소 관계 아틀라스</title>
+<title>인터랙티브 주기율표</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -28,12 +28,11 @@ body{font-family:var(--font);background:
   radial-gradient(circle at top, rgba(255,255,255,0.72), transparent 420px),
   linear-gradient(180deg,var(--page-backdrop-top) 0%,var(--page-backdrop-bottom) 100%);
   color:var(--text);min-height:100vh;padding:34px 12px 60px}
-header{max-width:1280px;margin:0 auto 16px;padding:14px 16px;border:0.5px solid var(--border);border-radius:var(--radius-lg);background:rgba(255,255,255,0.46);box-shadow:0 5px 22px rgba(48,44,36,0.06)}
-h1{font-size:22px;font-weight:600;margin-bottom:4px;color:#1a1a18;letter-spacing:0.01em}
+header{max-width:1280px;margin:0 auto 18px}
+h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 .sub{font-size:13px;color:#6b6b66}
-.brand-en{margin-top:5px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#8a877f}
 #app{max-width:1280px;margin:0 auto}
-#controls{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;align-items:center;padding:10px;border:0.5px solid var(--border);border-radius:var(--radius-lg);background:rgba(255,255,255,0.42)}
+#controls{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;align-items:center}
 #search{flex:1;min-width:130px;max-width:190px;height:30px;font-size:12px;padding:0 10px;
   border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);outline:none}
 #search:focus{border-color:#378ADD}
@@ -45,7 +44,7 @@ h1{font-size:22px;font-weight:600;margin-bottom:4px;color:#1a1a18;letter-spacing
 .lb{height:24px;padding:0 8px;font-size:10px;border:0.5px solid var(--border2);border-radius:999px;
   background:transparent;color:var(--text2);cursor:pointer;transition:background 0.1s,color 0.1s}
 .lb:hover,.lb.active{background:var(--bg2);color:var(--text)}
-#layer-note{font-size:11px;color:var(--text2);min-height:24px;margin-bottom:8px;line-height:1.45}
+#layer-note{font-size:11px;color:var(--text2);min-height:16px;margin-bottom:8px}
 #mode-note{font-size:10px;color:var(--text2);min-height:14px;margin:0 0 8px 2px;line-height:1.4}
 #master-study-controls{display:none;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 8px 2px}
 #master-study-controls.show{display:flex}
@@ -58,28 +57,28 @@ h1{font-size:22px;font-weight:600;margin-bottom:4px;color:#1a1a18;letter-spacing
 .cell{aspect-ratio:1;border-radius:3px;cursor:pointer;display:flex;flex-direction:column;
   align-items:center;justify-content:center;padding:1px;border:0.5px solid transparent;
   transition:transform 0.1s,border-color 0.1s;min-width:0;-webkit-tap-highlight-color:transparent}
-.cell:hover{transform:scale(1.06);z-index:10;border-color:rgba(0,0,0,0.28)}
+.cell:hover{transform:scale(1.14);z-index:10;border-color:rgba(0,0,0,0.35)}
 .cell.sel{transform:scale(1.08);z-index:5;border-width:1.5px}
-.cell.rel-focus{box-shadow:0 0 0 2px rgba(19,34,56,0.35),0 6px 14px rgba(18,28,39,0.14);opacity:1!important}
-.cell.rel-group{outline:2px solid rgba(35,57,84,0.58);outline-offset:-2px;box-shadow:0 0 0 1px rgba(255,255,255,0.44) inset}
-.cell.rel-period{background-image:linear-gradient(rgba(255,255,255,0.25),rgba(255,255,255,0.25));outline:1px solid rgba(70,76,84,0.18);outline-offset:-1px;opacity:0.97}
+.cell.rel-focus{box-shadow:0 0 0 2px rgba(0,0,0,0.12),0 4px 10px rgba(0,0,0,0.08)}
+.cell.rel-group{outline:1px solid rgba(0,0,0,0.28);outline-offset:-1px;box-shadow:0 0 0 1px rgba(255,255,255,0.36) inset}
+.cell.rel-period{outline:1px dashed rgba(0,0,0,0.2);outline-offset:-2px;opacity:0.94}
 .cell.rel-group.rel-period{outline:1px solid rgba(0,0,0,0.26)}
-.cell.dimmed{opacity:0.2}
+.cell.dimmed{opacity:0.13}
 .cell .num{font-size:6px;opacity:0.6;line-height:1;pointer-events:none}
 .cell .sym{font-size:10px;font-weight:500;line-height:1.15;pointer-events:none}
 .cell .elname{font-size:5px;opacity:0.7;line-height:1;white-space:nowrap;overflow:hidden;max-width:100%;pointer-events:none}
 .blank{background:transparent!important;pointer-events:none;border:none!important}
 .srow{display:grid;grid-template-columns:repeat(18,1fr);gap:2px;margin-bottom:2px}
 .slbl{font-size:8px;color:var(--text3);grid-column:1/4;display:flex;align-items:center;justify-content:flex-end;padding-right:3px}
-#panel{margin-top:12px;background:var(--panel-bg);backdrop-filter:blur(6px);border:0.5px solid rgba(0,0,0,0.12);box-shadow:0 16px 36px rgba(35,32,25,0.09);border-radius:var(--radius-lg);padding:18px;display:none;color:var(--panel-text}
+#panel{margin-top:12px;background:var(--panel-bg);border:0.5px solid rgba(0,0,0,0.12);border-radius:var(--radius-lg);padding:18px;display:none;color:var(--panel-text)}
 #panel.show{display:block}
-#panel-top{display:grid;grid-template-columns:auto 1fr auto;align-items:flex-start;gap:14px;margin-bottom:14px}
-#pbadge{width:94px;height:94px;border-radius:10px;display:flex;flex-direction:column;
+#panel-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+#pbadge{width:62px;height:62px;border-radius:var(--radius);display:flex;flex-direction:column;
   align-items:center;justify-content:center;flex-shrink:0}
-#pbadge .psym{font-size:34px;font-weight:600;line-height:1}
-#pbadge .pnum{font-size:12px;opacity:0.8}
+#pbadge .psym{font-size:26px;font-weight:500;line-height:1}
+#pbadge .pnum{font-size:10px;opacity:0.7}
 #pinfo{flex:1;min-width:0}
-#pname{font-size:20px;font-weight:600;color:var(--panel-text)}
+#pname{font-size:17px;font-weight:500;color:var(--panel-text)}
 #pcat{font-size:12px;color:var(--panel-muted);margin-top:2px}
 #pec{font-size:11px;color:var(--panel-muted);margin-top:4px}
 #pclose{height:27px;padding:0 12px;font-size:11px;cursor:pointer;border:0.5px solid var(--border2);
@@ -95,45 +94,6 @@ h1{font-size:22px;font-weight:600;margin-bottom:4px;color:#1a1a18;letter-spacing
 #story-card{margin-top:10px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
 .story-title{font-size:11px;color:var(--panel-muted);margin-bottom:5px}
 #story-text{font-size:12px;color:var(--panel-text);line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
-#object-card{display:none;margin-top:10px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
-#object-card.show{display:block}
-.object-title{font-size:11px;color:var(--panel-muted);margin-bottom:6px}
-.object-visual{width:100%;max-width:210px;height:72px;display:flex;align-items:center;justify-content:center}
-.object-label{font-size:11px;color:var(--panel-muted);margin-top:4px}
-.object-svg{width:180px;height:64px;overflow:visible}
-.obj-core{fill:none;stroke:rgba(42,42,38,0.46);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
-.obj-soft{fill:rgba(255,255,255,0.35);stroke:rgba(42,42,38,0.2);stroke-width:1}
-.obj-highlight{fill:none;stroke:rgba(255,255,255,0.52);stroke-width:1.2}
-.obj-metal{fill:none;stroke:rgba(255,255,255,0.48);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.2}
-.obj-he-body{fill:#f2ede2;stroke:#9f9588;stroke-width:1}
-.obj-he-gloss{fill:none;stroke:rgba(255,255,255,0.78);stroke-width:1.3}
-.obj-ne-tube{fill:none;stroke:#a17f87;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
-.obj-ne-glow{fill:none;stroke:#be9aa1;stroke-width:5.6;stroke-linecap:round;stroke-linejoin:round;opacity:.28;filter:blur(.3px)}
-.obj-si-body{fill:#d7dde2;stroke:#7b858f;stroke-width:1}
-.obj-si-path{fill:none;stroke:#7f8993;stroke-width:1.15;stroke-linecap:round;stroke-linejoin:round}
-.obj-si-signal{fill:none;stroke:#cfd6dc;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
-.obj-cu-wire{fill:none;stroke:#977867;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
-.obj-cu-sheen{fill:none;stroke:#ccb09d;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.14}
-.obj-au-ring{fill:none;stroke:#a58c62;stroke-width:4.2;stroke-linecap:round;stroke-linejoin:round}
-.obj-au-inner{fill:none;stroke:#cab792;stroke-width:1.3;opacity:.52}
-.obj-au-sweep{fill:none;stroke:#e1d2b5;stroke-width:1.9;opacity:.16;stroke-linecap:round;stroke-linejoin:round}
-.anim-he-drift{transform-origin:90px 30px;animation:heDrift 5.6s ease-in-out infinite}
-.anim-he-string{transform-origin:92px 44px;animation:heString 5.6s ease-in-out infinite;animation-delay:.18s}
-.anim-neon-breathe{animation:neonBreathe 4.4s ease-in-out infinite}
-.anim-chip-trace{stroke-dasharray:12 48;stroke-dashoffset:64;animation:chipTrace 3.7s ease-in-out infinite}
-.anim-chip-trace-b{stroke-dasharray:10 42;stroke-dashoffset:56;animation:chipTraceB 4.1s ease-in-out infinite}
-.anim-wire-sheen{stroke-dasharray:22 68;stroke-dashoffset:88;animation:wireSheen 5.6s ease-in-out infinite}
-.anim-ring-sweep{stroke-dasharray:24 88;stroke-dashoffset:94;animation:ringSweep 5.1s ease-in-out infinite}
-@keyframes heDrift{0%,100%{transform:translate(0,0) rotate(-.34deg)}25%{transform:translate(1.7px,-1.7px) rotate(.25deg)}50%{transform:translate(-1.8px,-3.4px) rotate(-.3deg)}75%{transform:translate(1.2px,-1.9px) rotate(.2deg)}}
-@keyframes heString{0%,100%{transform:translate(0,0) rotate(.04deg)}30%{transform:translate(-.8px,.35px) rotate(-1deg)}56%{transform:translate(1.05px,.5px) rotate(1.1deg)}82%{transform:translate(-.56px,.26px) rotate(-.52deg)}}
-@keyframes neonBreathe{0%,100%{opacity:.26}36%{opacity:.56}68%{opacity:.42}}
-@keyframes chipTrace{0%{stroke-dashoffset:64;opacity:.12}38%{opacity:.44}70%{opacity:.64}100%{stroke-dashoffset:-20;opacity:.12}}
-@keyframes chipTraceB{0%{stroke-dashoffset:56;opacity:.08}34%{opacity:.31}66%{opacity:.51}100%{stroke-dashoffset:-18;opacity:.1}}
-@keyframes wireSheen{0%{stroke-dashoffset:88;opacity:.1}34%{opacity:.3}68%{opacity:.34}100%{stroke-dashoffset:-14;opacity:.09}}
-@keyframes ringSweep{0%{stroke-dashoffset:94;opacity:.1}38%{opacity:.38}72%{opacity:.3}100%{stroke-dashoffset:-10;opacity:.1}}
-@media(prefers-reduced-motion:reduce){
-  .anim-he-drift,.anim-he-string,.anim-neon-breathe,.anim-chip-trace,.anim-chip-trace-b,.anim-wire-sheen,.anim-ring-sweep{animation:none!important}
-}
 #compare-card{display:none;margin-top:14px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
 #compare-card.show{display:block}
 .cmp-title{font-size:11px;color:var(--panel-muted);margin-bottom:7px}
@@ -150,14 +110,6 @@ h1{font-size:22px;font-weight:600;margin-bottom:4px;color:#1a1a18;letter-spacing
   #search,.fb,.lb,#pclose{background:rgba(255,255,255,0.78);color:#2a2a26;border-color:rgba(0,0,0,0.22)}
   .fb:hover,.fb.active,.lb:hover,.lb.active,#pclose:hover{background:rgba(255,255,255,0.92);color:#1a1a18}
 }
-
-#guide-cards{margin:0 0 10px 0}
-.guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.guide-card{background:rgba(255,255,255,0.52);border:0.5px solid var(--border);border-radius:10px;padding:9px 10px;box-shadow:0 3px 10px rgba(30,28,24,0.05)}
-.guide-title{font-size:11px;font-weight:600;color:var(--text);margin-bottom:4px}
-.guide-desc{font-size:10px;line-height:1.45;color:var(--text2)}
-button:focus-visible,input:focus-visible{outline:2px solid rgba(48,93,140,0.42);outline-offset:1px}
-
 footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;background:transparent}
 .credit-title{font-family:Georgia,"Times New Roman",serif;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--text2)}
 .credit-sub{font-family:Georgia,"Times New Roman",serif;font-size:11px;font-style:italic;color:var(--text2);margin-top:4px}
@@ -176,19 +128,17 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
   .cell .sym{font-size:15px;font-weight:600}
   .cell .elname{font-size:7px}
 }
-@media(max-width:860px){#panel-top{grid-template-columns:1fr}#pclose{justify-self:start}#stats{grid-template-columns:repeat(2,1fr)} .guide-grid{grid-template-columns:1fr}}
-@media(max-width:680px){.cmp-grid{grid-template-columns:1fr} body{padding:22px 10px 54px} #stats{grid-template-columns:1fr}}
+@media(max-width:680px){.cmp-grid{grid-template-columns:1fr} body{padding:22px 10px 54px}}
 </style>
 </head>
 <body>
 <header>
-  <h1>원소 관계 아틀라스</h1>
-  <p class="sub">118개 원소를 분류, 성질, 관계, 쓰임으로 이해하는 인터랙티브 주기율표</p>
-  <p class="brand-en">Element Relation Atlas</p>
+  <h1>인터랙티브 주기율표</h1>
+  <p class="sub">118개 원소 · 원소를 클릭하면 전자 배치 애니메이션을 볼 수 있습니다</p>
 </header>
 <div id="app">
   <div id="controls">
-    <input id="search" type="text" placeholder="원소 이름, 기호, 번호 검색" />
+    <input id="search" type="text" placeholder="원소 검색 (이름, 기호, 번호)..." />
     <button class="fb active" data-cat="all">전체</button>
     <button class="fb" data-cat="nonmetal">비금속</button>
     <button class="fb" data-cat="noble gas">비활성 기체</button>
@@ -202,13 +152,6 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
     <button class="fb" id="relation-toggle">같은 족·주기 보기</button>
     <button class="fb" id="compare-toggle">두 원소 비교</button>
     <button class="fb" id="master-toggle">1~20 원소 마스터</button>
-  </div>
-  <div id="guide-cards">
-    <div class="guide-grid">
-      <div class="guide-card"><div class="guide-title">분류로 보기</div><div class="guide-desc">금속, 비금속, 비활성 기체처럼 원소의 큰 성격을 먼저 파악합니다.</div></div>
-      <div class="guide-card"><div class="guide-title">성질로 보기</div><div class="guide-desc">원자 반지름, 전기음성도, 이온화 에너지의 경향을 색으로 비교합니다.</div></div>
-      <div class="guide-card"><div class="guide-title">관계로 보기</div><div class="guide-desc">같은 족과 같은 주기를 따라 원소들이 어떻게 닮고 달라지는지 확인합니다.</div></div>
-    </div>
   </div>
   <div id="mode-note"></div>
   <div id="master-study-controls">
@@ -233,7 +176,6 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
       <div id="pbadge"><span class="psym" id="psym"></span><span class="pnum" id="pnum"></span></div>
       <div id="pinfo">
         <div id="pname"></div>
-        <div id="pename" style="font-size:12px;color:var(--panel-muted);margin-top:2px"></div>
         <div id="pcat"></div>
         <div id="pec"></div>
       </div>
@@ -245,7 +187,7 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
       <div class="st"><div class="st-l">전기음성도</div><div class="st-v" id="s-en"></div></div>
       <div class="st"><div class="st-l">주기</div><div class="st-v" id="s-period"></div></div>
       <div class="st"><div class="st-l">족</div><div class="st-v" id="s-group"></div></div>
-      <div class="st"><div class="st-l">분류</div><div class="st-v" id="s-class"></div></div>
+      <div class="st"><div class="st-l">전자 수</div><div class="st-v" id="s-ecount"></div></div>
     </div>
 	    <div id="canvas-wrap">
 	      <canvas id="ecanvas" width="320" height="240"></canvas>
@@ -254,11 +196,6 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
       <div id="story-card">
         <div class="story-title">원소 이야기</div>
         <div id="story-text">이 원소의 이야기는 준비 중입니다.</div>
-      </div>
-      <div id="object-card">
-        <div class="object-title">대표 오브젝트</div>
-        <div class="object-visual" id="object-visual"></div>
-        <div class="object-label" id="object-label"></div>
       </div>
       <div id="compare-card"></div>
       <div id="relation-note" style="margin-top:10px;font-size:11px;color:var(--panel-muted);line-height:1.5"></div>
@@ -321,45 +258,6 @@ const ELEMENT_STORIES={
   82:"무겁고 부드러운 금속입니다. 과거에는 널리 쓰였지만 독성 문제 때문에 사용이 크게 제한되었습니다.",
   92:"원자력과 방사성 원소를 설명할 때 자주 등장합니다. 강한 에너지를 품은 원소로, 안전한 관리가 매우 중요합니다."
 };
-const ELEMENT_OBJECTS={
-  2:{label:"풍선",type:"balloon"},
-  10:{label:"네온사인",type:"neon"},
-  14:{label:"반도체 칩",type:"chip"},
-  29:{label:"감긴 전선",type:"wire"},
-  79:{label:"금반지",type:"ring"}
-};
-
-function objectSVG(type){
-  if(type==="balloon")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="풍선">
-    <g class="anim-he-drift"><ellipse class="obj-he-body" cx="90" cy="23.8" rx="12.6" ry="16.8"/><path class="obj-he-gloss" d="M84.8 16.3c1.8-2.4 4.1-3.5 6.5-3.5"/><path class="obj-core" d="M90.2 40.9c0 2.2 1.1 3.5 2.4 4.8"/></g><path class="obj-core anim-he-string" d="M92.5 45.6c1.1 2.6 1.4 5.4.9 8.5-.2 1.5-.7 3-1.5 4.6"/></svg>`;
-  if(type==="neon")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="네온사인">
-    <rect class="obj-soft" x="47" y="16.5" width="86" height="31" rx="7"/><path class="obj-ne-glow anim-neon-breathe" d="M60 39V24.2l8.8 10.9V24.2m8.2 14.8V24.2h10.8m-10.8 7.4h9.8m8.4 7.4V24.2h7.9c4.6 0 7.4 2.8 7.4 7.4s-2.8 7.4-7.4 7.4h-7.9"/><path class="obj-ne-tube" d="M60 39V24.2l8.8 10.9V24.2m8.2 14.8V24.2h10.8m-10.8 7.4h9.8m8.4 7.4V24.2h7.9c4.6 0 7.4 2.8 7.4 7.4s-2.8 7.4-7.4 7.4h-7.9"/><path class="obj-highlight anim-neon-breathe" d="M60 39V24.2l8.8 10.9V24.2m8.2 14.8V24.2h10.8m-10.8 7.4h9.8m8.4 7.4V24.2h7.9c4.6 0 7.4 2.8 7.4 7.4s-2.8 7.4-7.4 7.4h-7.9"/></svg>`;
-  if(type==="chip")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="반도체 칩">
-    <rect class="obj-si-body" x="62" y="14.2" width="56" height="35.6" rx="5.4"/><rect class="obj-core" x="62" y="14.2" width="56" height="35.6" rx="5.4"/><rect class="obj-si-path" x="73" y="23" width="34" height="18.2" rx="2.4"/><path class="obj-core" d="M62 20h-6m6 6h-6m6 6h-6m6 6h-6m6 6h-6m62-24h6m-6 6h6m-6 6h6m-6 6h6m-6 6h6"/><path class="obj-si-path" d="M73 27h-9m43 0h9M90 23v-6m0 32v-6m-11-10h22"/><path class="obj-si-path" d="M75 37h12v-7h15m-8 10h14v-8h9"/>
-    <path class="obj-si-signal anim-chip-trace" d="M75 37h12v-7h15"/><path class="obj-si-signal anim-chip-trace-b" d="M94 40h14v-8h9"/></svg>`;
-  if(type==="wire")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="감긴 전선">
-    <path class="obj-cu-wire" d="M38 40.2c0-9.3 9.5-16.7 21.2-16.7s21.2 7.4 21.2 16.7-9.5 16.7-21.2 16.7S38 49.5 38 40.2zm34.4 0c0-9.3 9.5-16.7 21.2-16.7s21.2 7.4 21.2 16.7-9.5 16.7-21.2 16.7-21.2-7.4-21.2-16.7zm34.4 0c0-9.3 9.5-16.7 21.2-16.7S149 30.9 149 40.2"/><path class="obj-cu-sheen anim-wire-sheen" d="M38 40.2c0-9.3 9.5-16.7 21.2-16.7s21.2 7.4 21.2 16.7-9.5 16.7-21.2 16.7m13.9-33c6.8 1.1 13 5.7 16.2 12.8m18.9-12.8c6.8 1.1 13 5.7 16.2 12.8"/></svg>`;
-  if(type==="ring")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="금반지">
-    <ellipse class="obj-au-ring" cx="90" cy="35.8" rx="26.4" ry="12.2" transform="rotate(-8 90 35.8)"/><ellipse class="obj-au-inner" cx="90" cy="35.8" rx="19.7" ry="8.6" transform="rotate(-8 90 35.8)"/><path class="obj-au-inner" d="M68.8 34.2c4.8-4.8 13.8-7.8 21.2-7.8 8.9 0 18.4 3.5 22.2 8.5"/>
-    <path class="obj-au-sweep anim-ring-sweep" d="M71.3 30.5c6.5-4.1 20.8-5.2 35.7-.9"/></svg>`;
-  return "";
-}
-
-function renderObjectCard(el){
-  const card=document.getElementById("object-card");
-  const visual=document.getElementById("object-visual");
-  const label=document.getElementById("object-label");
-  const obj=ELEMENT_OBJECTS[el.n];
-  if(!obj){
-    card.classList.remove("show");
-    visual.innerHTML="";
-    label.textContent="";
-    return;
-  }
-  visual.innerHTML=objectSVG(obj.type);
-  label.textContent=obj.label;
-  card.classList.add("show");
-}
 
 const EL=[
  {n:1,sym:"H",name:"수소",cat:"nonmetal",mass:"1.008",period:1,group:1,phase:"gas",ec:"1s¹",en:"2.20"},
@@ -518,7 +416,6 @@ function makeCell(el){
   const div=document.createElement("div");
   div.className="cell";
   div.dataset.n=el.n;
-  div.title=`${el.name} ${el.sym} · ${el.n}번`;
   const c=gc(el.cat);
   div.style.color=c.text;
   div.innerHTML=`<span class="num">${el.n}</span><span class="sym">${el.sym}</span><span class="elname">${el.name}</span>`;
@@ -630,12 +527,12 @@ function applyLayerColors(){
 }
 function updateLayerNote(){
   const notes={
-    none:"기본 보기: 원소의 분류 색으로 전체 지형을 확인합니다.",
-    en:"전기음성도: 오른쪽 위로 갈수록 커지는 경향이 있습니다. 단, 비활성 기체 등 예외가 있습니다. (낮음→옅음 / 높음→진함)",
-    radius:"원자 반지름: 왼쪽 아래로 갈수록 커지는 경향이 있습니다. (작음→옅음 / 큼→진함)",
-    ionization:"이온화 에너지: 전자를 떼어내기 어려운 정도로, 오른쪽 위로 갈수록 커지는 경향이 있습니다. (낮음→옅음 / 높음→진함)",
-    metallicity:"금속성: 왼쪽 아래로 갈수록 강해지는 경향이 있습니다. (약함→옅음 / 강함→진함)",
-    valence:"최외각 전자: 같은 족 원소들은 비슷한 최외각 전자 수를 가지는 경향이 있습니다. (적음→옅음 / 많음→진함)"
+    none:"기본: 기존 원소 분류 색상을 표시합니다.",
+    en:"전기음성도: 오른쪽 위로 갈수록 대체로 커집니다.",
+    radius:"원자 반지름: 왼쪽 아래로 갈수록 대체로 커집니다.",
+    ionization:"이온화 에너지: 오른쪽 위로 갈수록 대체로 커집니다.",
+    metallicity:"금속성: 왼쪽 아래로 갈수록 대체로 강해집니다.",
+    valence:"최외각 전자: 같은 족 원소들은 비슷한 최외각 전자 수를 가집니다."
   };
   document.getElementById("layer-note").textContent=notes[activeLayer]||notes.none;
 }
@@ -712,7 +609,7 @@ function relationDescription(el){
     : `${el.name}은 특수 계열 원소로 분류되며, 일반적인 족 비교보다는 계열 내부 경향을 함께 보는 것이 자연스럽습니다.`;
   const pd=el.period<=7?el.period:(el.period===9?6:7);
   const periodText=`${el.name}은 ${pd}주기 원소입니다. 같은 주기에서는 왼쪽에서 오른쪽으로 갈수록 성질이 점진적으로 변합니다.`;
-  return `<strong style="font-size:11px;font-weight:600">같은 족·같은 주기 관계</strong><br>${groupText}<br>${periodText}`;
+  return `<strong style="font-size:11px;font-weight:500">같은 족·주기 관계</strong><br>${groupText}<br>${periodText}`;
 }
 
 function openPanel(el){
@@ -726,7 +623,6 @@ function openPanel(el){
   document.getElementById("psym").textContent=el.sym;
   document.getElementById("pnum").textContent=el.n;
   document.getElementById("pname").textContent=el.name;
-  document.getElementById("pename").textContent=`영문 표기: ${el.sym}`;
   document.getElementById("pcat").textContent=CKR[el.cat]||el.cat;
   document.getElementById("pec").textContent="전자 배치: "+el.ec;
   document.getElementById("s-mass").textContent=el.mass;
@@ -735,11 +631,10 @@ function openPanel(el){
   const pd=el.period<=7?el.period:(el.period===9?6:7);
   document.getElementById("s-period").textContent=pd+"주기";
   document.getElementById("s-group").textContent=el.group+"족";
-  document.getElementById("s-class").textContent=CKR[el.cat]||el.cat;
+  document.getElementById("s-ecount").textContent=el.n+"개";
   const rNote=document.getElementById("relation-note");
   rNote.innerHTML=relationMode?relationDescription(el):"";
   document.getElementById("story-text").textContent=ELEMENT_STORIES[el.n]||"이 원소의 이야기는 준비 중입니다.";
-  renderObjectCard(el);
   selectedElementN=el.n;
   applyRelationshipHighlight(el);
   const sh=shells(el.n);
@@ -754,7 +649,6 @@ function closePanel(){
   if(raf){cancelAnimationFrame(raf);raf=null;}
   document.getElementById("panel").classList.remove("show");
   document.getElementById("compare-card").classList.remove("show");
-  document.getElementById("object-card").classList.remove("show");
   document.querySelectorAll(".cell.sel").forEach(c=>{c.classList.remove("sel");c.style.borderColor="";});
   selectedElementN=null;
   clearRelationshipHighlight();
@@ -848,7 +742,7 @@ function updateModeNote(){
     return;
   }
   if(masterMode){
-    note.textContent="1~20번 원소는 화학 학습의 출발점입니다. 이름, 기호, 원자번호를 번갈아 가리며 암기해 보세요.";
+    note.textContent="1~20번 원소를 집중해서 익히는 모드입니다.";
     return;
   }
   note.textContent="";
