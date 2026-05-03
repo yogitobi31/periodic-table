@@ -111,6 +111,9 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 @keyframes objectPulse{0%,100%{opacity:.38}50%{opacity:.74}}
 @keyframes objectShimmer{0%,100%{opacity:.2}50%{opacity:.56}}
 @keyframes objectSweep{0%{transform:translateX(-28px);opacity:0}25%,75%{opacity:.45}100%{transform:translateX(28px);opacity:0}}
+@media(prefers-reduced-motion:reduce){
+  .anim-float,.anim-pulse,.anim-shimmer,.anim-sweep{animation:none!important}
+}
 #compare-card{display:none;margin-top:14px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
 #compare-card.show{display:block}
 .cmp-title{font-size:11px;color:var(--panel-muted);margin-bottom:7px}
