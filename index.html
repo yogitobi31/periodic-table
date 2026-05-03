@@ -94,6 +94,23 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 #story-card{margin-top:10px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
 .story-title{font-size:11px;color:var(--panel-muted);margin-bottom:5px}
 #story-text{font-size:12px;color:var(--panel-text);line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
+#object-card{display:none;margin-top:10px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
+#object-card.show{display:block}
+.object-title{font-size:11px;color:var(--panel-muted);margin-bottom:6px}
+.object-visual{width:100%;max-width:210px;height:72px;display:flex;align-items:center;justify-content:center}
+.object-label{font-size:11px;color:var(--panel-muted);margin-top:4px}
+.object-svg{width:180px;height:64px;overflow:visible}
+.obj-core{fill:none;stroke:rgba(42,42,38,0.46);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.obj-soft{fill:rgba(255,255,255,0.35);stroke:rgba(42,42,38,0.2);stroke-width:1}
+.obj-highlight{fill:none;stroke:rgba(255,255,255,0.55);stroke-width:1.2}
+.anim-float{animation:objectFloat 5.4s ease-in-out infinite}
+.anim-pulse{animation:objectPulse 3.6s ease-in-out infinite}
+.anim-shimmer{animation:objectShimmer 4.8s ease-in-out infinite}
+.anim-sweep{animation:objectSweep 5.2s linear infinite}
+@keyframes objectFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes objectPulse{0%,100%{opacity:.38}50%{opacity:.74}}
+@keyframes objectShimmer{0%,100%{opacity:.2}50%{opacity:.56}}
+@keyframes objectSweep{0%{transform:translateX(-28px);opacity:0}25%,75%{opacity:.45}100%{transform:translateX(28px);opacity:0}}
 #compare-card{display:none;margin-top:14px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
 #compare-card.show{display:block}
 .cmp-title{font-size:11px;color:var(--panel-muted);margin-bottom:7px}
@@ -197,6 +214,11 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
         <div class="story-title">원소 이야기</div>
         <div id="story-text">이 원소의 이야기는 준비 중입니다.</div>
       </div>
+      <div id="object-card">
+        <div class="object-title">대표 오브젝트</div>
+        <div class="object-visual" id="object-visual"></div>
+        <div class="object-label" id="object-label"></div>
+      </div>
       <div id="compare-card"></div>
       <div id="relation-note" style="margin-top:10px;font-size:11px;color:var(--panel-muted);line-height:1.5"></div>
 	  </div>
@@ -258,6 +280,47 @@ const ELEMENT_STORIES={
   82:"무겁고 부드러운 금속입니다. 과거에는 널리 쓰였지만 독성 문제 때문에 사용이 크게 제한되었습니다.",
   92:"원자력과 방사성 원소를 설명할 때 자주 등장합니다. 강한 에너지를 품은 원소로, 안전한 관리가 매우 중요합니다."
 };
+const ELEMENT_OBJECTS={
+  2:{label:"풍선",type:"balloon"},
+  10:{label:"네온사인",type:"neon"},
+  14:{label:"반도체 칩",type:"chip"},
+  29:{label:"감긴 전선",type:"wire"},
+  79:{label:"금반지",type:"ring"}
+};
+
+function objectSVG(type){
+  if(type==="balloon")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="풍선">
+    <g class="anim-float"><ellipse class="obj-soft" cx="86" cy="24" rx="16" ry="20"/><path class="obj-highlight" d="M79 15c1.8-3.4 4.8-5.2 8.6-5.4"/><path class="obj-core" d="M86 44c0 4 2 5 4 7"/><path class="obj-core" d="M90 51c2 3 3 6 3 9"/></g></svg>`;
+  if(type==="neon")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="네온사인">
+    <rect class="obj-soft" x="38" y="12" width="104" height="40" rx="6"/><path class="obj-core" d="M56 41V23h12c6 0 10 4 10 9s-4 9-10 9H56z"/><path class="obj-core" d="M87 41V23l15 18V23"/><path class="obj-core" d="M113 41V23h15"/>
+    <rect class="obj-highlight anim-pulse" x="43" y="16" width="94" height="32" rx="4"/></svg>`;
+  if(type==="chip")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="반도체 칩">
+    <rect class="obj-soft" x="62" y="16" width="56" height="32" rx="4"/><rect class="obj-core" x="68" y="22" width="44" height="20" rx="2"/><path class="obj-core" d="M74 28h32M74 36h20"/>
+    <g class="anim-pulse"><circle cx="102" cy="36" r="2.1" fill="rgba(42,42,38,0.42)"/></g></svg>`;
+  if(type==="wire")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="감긴 전선">
+    <path class="obj-core" d="M46 40c0-10 10-18 22-18s22 8 22 18-10 18-22 18"/><path class="obj-core" d="M84 40c0-10 10-18 22-18s22 8 22 18-10 18-22 18"/><path class="obj-core" d="M122 40c0-10 10-18 22-18"/>
+    <path class="obj-highlight anim-shimmer" d="M44 31c8-8 18-8 26 0M82 31c8-8 18-8 26 0"/></svg>`;
+  if(type==="ring")return `<svg class="object-svg" viewBox="0 0 180 64" role="img" aria-label="금반지">
+    <ellipse class="obj-soft" cx="90" cy="36" rx="32" ry="15"/><ellipse class="obj-core" cx="90" cy="36" rx="26" ry="11"/><ellipse class="obj-highlight" cx="90" cy="35.5" rx="16" ry="6.5"/>
+    <rect class="anim-sweep" x="84" y="22" width="4" height="28" rx="2" fill="rgba(255,255,255,0.6)"/></svg>`;
+  return "";
+}
+
+function renderObjectCard(el){
+  const card=document.getElementById("object-card");
+  const visual=document.getElementById("object-visual");
+  const label=document.getElementById("object-label");
+  const obj=ELEMENT_OBJECTS[el.n];
+  if(!obj){
+    card.classList.remove("show");
+    visual.innerHTML="";
+    label.textContent="";
+    return;
+  }
+  visual.innerHTML=objectSVG(obj.type);
+  label.textContent=obj.label;
+  card.classList.add("show");
+}
 
 const EL=[
  {n:1,sym:"H",name:"수소",cat:"nonmetal",mass:"1.008",period:1,group:1,phase:"gas",ec:"1s¹",en:"2.20"},
@@ -635,6 +698,7 @@ function openPanel(el){
   const rNote=document.getElementById("relation-note");
   rNote.innerHTML=relationMode?relationDescription(el):"";
   document.getElementById("story-text").textContent=ELEMENT_STORIES[el.n]||"이 원소의 이야기는 준비 중입니다.";
+  renderObjectCard(el);
   selectedElementN=el.n;
   applyRelationshipHighlight(el);
   const sh=shells(el.n);
@@ -649,6 +713,7 @@ function closePanel(){
   if(raf){cancelAnimationFrame(raf);raf=null;}
   document.getElementById("panel").classList.remove("show");
   document.getElementById("compare-card").classList.remove("show");
+  document.getElementById("object-card").classList.remove("show");
   document.querySelectorAll(".cell.sel").forEach(c=>{c.classList.remove("sel");c.style.borderColor="";});
   selectedElementN=null;
   clearRelationshipHighlight();
