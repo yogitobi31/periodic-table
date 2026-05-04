@@ -117,6 +117,25 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
   #search,.fb,.lb,#pclose{background:rgba(255,255,255,0.78);color:#2a2a26;border-color:rgba(0,0,0,0.22)}
   .fb:hover,.fb.active,.lb:hover,.lb.active,#pclose:hover{background:rgba(255,255,255,0.92);color:#1a1a18}
 }
+
+#lab-fab-wrap{position:fixed;right:18px;bottom:18px;z-index:90;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none}
+#lab-panel{display:none;min-width:188px;max-width:240px;padding:11px 12px;border-radius:14px;background:rgba(255,255,255,0.58);border:1px solid rgba(255,255,255,0.52);box-shadow:0 14px 30px rgba(20,26,34,0.16);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--text2);font-size:12px;line-height:1.45;pointer-events:auto}
+#lab-panel.show{display:block}
+#lab-fab{pointer-events:auto;display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.62);background:linear-gradient(140deg,rgba(255,255,255,0.72),rgba(248,246,242,0.44));box-shadow:0 10px 22px rgba(23,28,36,0.14), inset 0 1px 0 rgba(255,255,255,0.68);color:#2a313d;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+#lab-fab:hover{transform:translateY(-2px);box-shadow:0 14px 26px rgba(23,28,36,0.18), inset 0 1px 0 rgba(255,255,255,0.72)}
+#lab-fab:active{transform:scale(.965)}
+#lab-fab:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(55,138,221,0.28),0 10px 22px rgba(23,28,36,0.16)}
+.lab-label{font-size:12px;letter-spacing:.02em;color:#3b4556}
+.lab-icon{width:23px;height:23px;display:block}
+.lab-icon *{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:680px){
+  #lab-fab-wrap{right:12px;bottom:12px}
+  #lab-fab{height:48px;padding:0 12px;gap:6px}
+  .lab-label{font-size:10px}
+  .lab-icon{width:21px;height:21px}
+  #lab-panel{min-width:150px;font-size:11px;padding:9px 10px}
+}
+
 footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;background:transparent}
 .credit-title{font-family:Georgia,"Times New Roman",serif;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--text2)}
 .credit-sub{font-family:Georgia,"Times New Roman",serif;font-size:11px;font-style:italic;color:var(--text2);margin-top:4px}
@@ -212,6 +231,19 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
       <div id="relation-note" style="margin-top:10px;font-size:11px;color:var(--panel-muted);line-height:1.5"></div>
 	  </div>
 </div>
+
+<div id="lab-fab-wrap">
+  <div id="lab-panel" role="status" aria-live="polite">원소 조합 실험실을 준비 중입니다.</div>
+  <button id="lab-fab" aria-label="실험실 열기" type="button">
+    <svg class="lab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M9 3.75h6"/>
+      <path d="M10 3.75v3.4l-5.2 9.24A2.5 2.5 0 0 0 6.98 20h10.04a2.5 2.5 0 0 0 2.18-3.61L14 7.15v-3.4"/>
+      <path d="M8.2 14.35c1.25-.35 2.35.88 3.8.88 1.32 0 2.25-.85 3.55-.85"/>
+    </svg>
+    <span class="lab-label">실험실</span>
+  </button>
+</div>
+
 <footer>
   <div class="credit-title">ELEMENT RELATION ATLAS</div>
   <div class="credit-sub">An interactive chemistry archive by Juwon Jeon</div>
@@ -1178,6 +1210,16 @@ document.querySelectorAll(".lb[data-master-view]").forEach(btn=>{
     updateMasterControls();
   });
 });
+
+const labFab=document.getElementById("lab-fab");
+const labPanel=document.getElementById("lab-panel");
+if(labFab&&labPanel){
+  labFab.addEventListener("click",()=>{
+    const isOpen=labPanel.classList.toggle("show");
+    labFab.setAttribute("aria-expanded",String(isOpen));
+  });
+}
+
 </script>
 </body>
 </html>
