@@ -134,6 +134,13 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 .lab-chip button{width:24px;height:24px;border-radius:999px;border:none;background:rgba(25,69,107,0.15);cursor:pointer}
 .lab-limit,.lab-result{font-size:11px;color:#8a4f2b;margin-top:8px;min-height:16px}
 .lab-result{color:var(--text2)}
+.lab-result-card{margin-top:10px;padding:14px;border-radius:12px;background:linear-gradient(145deg,rgba(255,255,255,0.9),rgba(241,248,255,0.72));border:1px solid rgba(46,126,214,0.24);box-shadow:0 8px 18px rgba(23,28,36,0.10)}
+.lab-result-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.lab-result-title{font-size:13px;font-weight:700;color:#1d3b5a}
+.lab-result-badge{font-size:10px;padding:3px 8px;border-radius:999px;background:rgba(47,126,214,0.14);color:#265b8e;font-weight:600}
+.lab-result-eq{font-size:17px;font-weight:700;color:#1a2736;margin-bottom:6px}
+.lab-result-name{font-size:12px;color:#36485c;line-height:1.5}
+.lab-result-missing{margin-top:10px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.6);border:1px dashed rgba(0,0,0,0.16);font-size:12px;color:var(--text2)}
 .lab-actions{display:flex;gap:8px;margin-top:12px}
 .lab-run{flex:1;height:38px;border:none;border-radius:10px;background:#2f7ed6;color:#fff;font-weight:600;cursor:pointer}
 .lab-run:disabled{opacity:.45;cursor:not-allowed}
@@ -1304,6 +1311,38 @@ const labResult=document.getElementById("labResult");
 const labTrayPanel=document.getElementById("labTrayPanel");
 const labModeGuide=document.getElementById("labModeGuide");
 const labSearch=document.getElementById("labSearch");
+const experimentResults={
+  "Cl+H":{equation:"H + Cl → HCl",name:"염화수소",formula:"HCl",type:"산성 기체"},
+  "C+H+O":{equation:"C + H + O → 유기물 계열",name:"유기물 계열 조합",formula:"C-H-O",type:"생명·유기 화학"},
+  "C+O":{equation:"C + O → CO₂",name:"이산화탄소",formula:"CO₂",type:"산화 반응"},
+  "Fe+O":{equation:"Fe + O → Fe₂O₃",name:"산화철",formula:"Fe₂O₃",type:"부식·산화"},
+  "H+N":{equation:"N + H → NH₃",name:"암모니아",formula:"NH₃",type:"질소 고정"},
+  "H+O":{equation:"H + O → H₂O",name:"물",formula:"H₂O",type:"기본 분자"},
+  "Cl+Na":{equation:"Na + Cl → NaCl",name:"소금",formula:"NaCl",type:"이온 결합"}
+};
+
+function buildCombinationKey(symbols){
+  return [...symbols].sort().join("+");
+}
+
+function renderExperimentResult(){
+  const key=buildCombinationKey(selectedElements);
+  const result=experimentResults[key];
+  if(!result){
+    labResult.innerHTML=`<div class="lab-result-missing">아직 등록되지 않은 조합이에요.</div>`;
+    return;
+  }
+  labResult.innerHTML=`
+    <article class="lab-result-card">
+      <div class="lab-result-head">
+        <strong class="lab-result-title">실험 결과 확인</strong>
+        <span class="lab-result-badge">${result.type}</span>
+      </div>
+      <div class="lab-result-eq">${result.equation}</div>
+      <div class="lab-result-name">생성 물질: <strong>${result.name}</strong> (${result.formula})</div>
+    </article>
+  `;
+}
 function setLabMode(open){
   if(!labFab||!labTrayPanel||!labResult||!labModeGuide)return;
   labMode=open;
@@ -1340,7 +1379,7 @@ function bindLabEvents(){
     renderLabTray();
   });
   labRun.addEventListener("click",()=>{
-    labResult.textContent="조합 결과 기능은 곧 추가될 예정이에요. 지금은 원소 선택 흐름을 먼저 테스트해보세요.";
+    renderExperimentResult();
   });
   labSearch.addEventListener("input",function(){
     activeSearch=this.value.trim();
