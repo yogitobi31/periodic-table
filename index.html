@@ -97,6 +97,9 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 #memory-card{margin-top:8px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
 .memory-title{font-size:11px;color:var(--panel-muted);margin-bottom:5px}
 #memory-text{font-size:12px;color:var(--panel-text);line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
+#name-origin-card{margin-top:8px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
+.name-origin-title{font-size:11px;color:var(--panel-muted);margin-bottom:5px}
+#name-origin-text{font-size:12px;color:var(--panel-text);line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
 #compare-card{display:none;margin-top:14px;background:var(--panel-soft);border:0.5px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:10px 12px}
 #compare-card.show{display:block}
 .cmp-title{font-size:11px;color:var(--panel-muted);margin-bottom:7px}
@@ -202,6 +205,7 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
         <div id="story-text">이 원소의 이야기는 준비 중입니다.</div>
       </div>
       <div id="memory-card"><div class="memory-title">기억 포인트</div><div id="memory-text">이 원소의 기억 포인트는 준비 중입니다.</div></div>
+      <div id="name-origin-card"><div class="name-origin-title">이름의 유래</div><div id="name-origin-text">이 원소 이름의 유래는 준비 중입니다.</div></div>
       <div id="compare-card"></div>
       <div id="relation-note" style="margin-top:10px;font-size:11px;color:var(--panel-muted);line-height:1.5"></div>
 	  </div>
@@ -370,6 +374,127 @@ const MEMORY_POINTS={
   18:"Ar은 거의 반응하지 않아 보호 기체로 쓰인다.",
   19:"K는 신경 신호와 근육 수축에 중요한 이온.",
   20:"Ca는 뼈와 치아를 단단하게 만드는 원소."
+};
+
+const ELEMENT_NAME_ORIGINS={
+  1:"수소의 영어 이름 Hydrogen은 그리스어 hydro(물)와 genes(만드는 것)에서 유래했습니다. ‘물을 만드는 것’이라는 뜻입니다.",
+  2:"헬륨(Helium)은 그리스 신화의 태양신 이름 Helios에서 유래했습니다. 태양 스펙트럼에서 먼저 확인되어 이런 이름이 붙었습니다.",
+  3:"리튬(Lithium)은 그리스어 lithos(돌)에서 유래했습니다. 식물이 아닌 광물에서 발견된 점을 강조한 이름입니다.",
+  4:"베릴륨(Beryllium)은 광물 베릴(beryl) 이름에서 유래했습니다.",
+  5:"붕소(Boron)는 붕사 borax 계열 명칭에서 유래한 것으로 알려져 있습니다.",
+  6:"탄소(Carbon)는 라틴어 carbo(숯, 목탄)에서 유래했습니다.",
+  7:"질소(Nitrogen)는 그리스어 nitron과 genes에서 유래했습니다. ‘초석을 만드는 것’이라는 뜻입니다.",
+  8:"산소(Oxygen)는 그리스어 oxys(신맛, 날카로움)와 genes에서 유래했습니다. 역사적으로 ‘산을 만든다’는 생각이 이름에 반영되었습니다.",
+  9:"플루오린(Fluorine)은 라틴어 fluere(흐르다)에서 유래했습니다. 광석을 잘 녹게 하는 플럭스 역할과 관련 있습니다.",
+  10:"네온(Neon)은 그리스어 neos(새로운)에서 유래했습니다.",
+  11:"나트륨(Sodium)은 soda 계열 명칭에서 왔고, 기호 Na는 라틴어 natrium에서 유래했습니다.",
+  12:"마그네슘(Magnesium)은 그리스 지역 이름 Magnesia에서 유래했습니다.",
+  13:"알루미늄(Aluminium)은 라틴어 alumen(명반)에서 유래했습니다.",
+  14:"규소(Silicon)는 라틴어 silex/silicis(부싯돌, 단단한 돌)에서 유래했습니다.",
+  15:"인(Phosphorus)은 그리스어 phosphoros(빛을 나르는 자)에서 유래했습니다.",
+  16:"황(Sulfur)은 고대 라틴어 sulfur 계열 이름에서 유래했습니다.",
+  17:"염소(Chlorine)는 그리스어 chloros(녹황색)에서 유래했습니다. 기체 색을 반영한 이름입니다.",
+  18:"아르곤(Argon)은 그리스어 argos(게으른, 반응이 둔한)에서 유래했습니다.",
+  19:"칼륨(Potassium)은 potash에서 왔고, 기호 K는 라틴어 kalium에서 유래했습니다.",
+  20:"칼슘(Calcium)은 라틴어 calx(석회)에서 유래했습니다.",
+  21:"스칸듐(Scandium)은 라틴어 Scandia(스칸디나비아)에서 유래했습니다.",
+  22:"타이타늄(Titanium)은 그리스 신화의 티탄(Titans)에서 유래했습니다.",
+  23:"바나듐(Vanadium)은 북유럽 신화의 여신 Vanadis(프레이야의 별칭)에서 유래했습니다.",
+  24:"크로뮴(Chromium)은 그리스어 chroma(색)에서 유래했습니다. 다양한 색 화합물로 유명합니다.",
+  25:"망가니즈(Manganese)는 자철광 계열 광물명 magnesia nigra와 연관된 명칭에서 유래한 것으로 알려져 있습니다.",
+  26:"철(Iron)의 기호 Fe는 라틴어 ferrum에서 유래했습니다.",
+  27:"코발트(Cobalt)는 독일어 kobold(광산의 요정)에서 유래했습니다.",
+  28:"니켈(Nickel)은 독일어 kupfernickel(악마의 구리)에서 유래했습니다.",
+  29:"구리(Copper)는 라틴어 cuprum에서 유래했고, 기호 Cu도 여기서 왔습니다.",
+  30:"아연(Zinc)은 독일어 zink 계열 명칭에서 유래한 것으로 알려져 있습니다.",
+  31:"갈륨(Gallium)은 라틴어 Gallia(프랑스)에서 유래했습니다.",
+  32:"저마늄(Germanium)은 라틴어 Germania(독일)에서 유래했습니다.",
+  33:"비소(Arsenic)는 그리스어 arsenikon에서 유래한 것으로 알려져 있습니다.",
+  34:"셀레늄(Selenium)은 그리스어 selene(달)에서 유래했습니다.",
+  35:"브로민(Bromine)은 그리스어 bromos(악취)에서 유래했습니다.",
+  36:"크립톤(Krypton)은 그리스어 kryptos(숨겨진)에서 유래했습니다.",
+  37:"루비듐(Rubidium)은 라틴어 rubidus(짙은 붉은색)에서 유래했습니다.",
+  38:"스트론튬(Strontium)은 스코틀랜드 지명 Strontian에서 유래했습니다.",
+  39:"이트륨(Yttrium)은 스웨덴 지명 이테르비(Ytterby)에서 유래했습니다.",
+  40:"지르코늄(Zirconium)은 광물 지르콘(zircon) 이름에서 유래했습니다.",
+  41:"나이오븀(Niobium)은 그리스 신화 인물 니오베(Niobe)에서 유래했습니다.",
+  42:"몰리브데넘(Molybdenum)은 그리스어 molybdos(납)에서 유래했습니다.",
+  43:"테크네튬(Technetium)은 그리스어 technetos(인공의)에서 유래했습니다.",
+  44:"루테늄(Ruthenium)은 라틴어 Ruthenia(동유럽 지역 옛 지명)에서 유래했습니다.",
+  45:"로듐(Rhodium)은 그리스어 rhodon(장미색)에서 유래했습니다.",
+  46:"팔라듐(Palladium)은 소행성 팔라스(Pallas) 이름에서 유래했습니다.",
+  47:"은(Silver)의 기호 Ag는 라틴어 argentum에서 유래했습니다.",
+  48:"카드뮴(Cadmium)은 라틴어 cadmia(아연 광석 명칭)에서 유래했습니다.",
+  49:"인듐(Indium)은 스펙트럼의 남색(indigo) 선에서 유래했습니다.",
+  50:"주석(Tin)의 기호 Sn은 라틴어 stannum에서 유래했습니다.",
+  51:"안티모니(Antimony)의 기호 Sb는 라틴어 stibium에서 유래했습니다.",
+  52:"텔루륨(Tellurium)은 라틴어 tellus(지구)에서 유래했습니다.",
+  53:"아이오딘(Iodine)은 그리스어 ioeides(보라색 같은)에서 유래했습니다.",
+  54:"제논(Xenon)은 그리스어 xenos(낯선)에서 유래했습니다.",
+  55:"세슘(Cesium)은 라틴어 caesius(푸른 하늘색)에서 유래했습니다.",
+  56:"바륨(Barium)은 그리스어 barys(무거운)에서 유래했습니다.",
+  57:"란타넘(Lanthanum)은 그리스어 lanthanein(숨겨져 있다)에서 유래했습니다.",
+  58:"세륨(Cerium)은 왜소행성 세레스(Ceres)에서 유래했습니다.",
+  59:"프라세오디뮴(Praseodymium)은 그리스어 prasios(연두색)와 didymos(쌍둥이)에서 유래했습니다.",
+  60:"네오디뮴(Neodymium)은 그리스어 neos(새로운)와 didymos(쌍둥이)에서 유래했습니다.",
+  61:"프로메튬(Promethium)은 그리스 신화의 프로메테우스(Prometheus)에서 유래했습니다.",
+  62:"사마륨(Samarium)은 광물 사마르스카이트(samarskite)에서 유래했습니다.",
+  63:"유로퓸(Europium)은 유럽(Europe)에서 유래했습니다.",
+  64:"가돌리늄(Gadolinium)은 과학자 요한 가돌린(Gadolin)의 이름에서 유래했습니다.",
+  65:"터븀(Terbium)은 스웨덴 이테르비(Ytterby) 지명에서 유래했습니다.",
+  66:"디스프로슘(Dysprosium)은 그리스어 dysprositos(얻기 어려운)에서 유래했습니다.",
+  67:"홀뮴(Holmium)은 스톡홀름의 라틴식 이름 Holmia에서 유래했습니다.",
+  68:"어븀(Erbium)은 스웨덴 이테르비(Ytterby) 지명에서 유래했습니다.",
+  69:"툴륨(Thulium)은 고대 지명 Thule에서 유래한 것으로 알려져 있습니다.",
+  70:"이터븀(Ytterbium)은 스웨덴 이테르비(Ytterby) 지명에서 유래했습니다.",
+  71:"루테튬(Lutetium)은 파리의 라틴식 이름 Lutetia에서 유래했습니다.",
+  72:"하프늄(Hafnium)은 코펜하겐의 라틴식 이름 Hafnia에서 유래했습니다.",
+  73:"탄탈럼(Tantalum)은 그리스 신화 인물 탄탈로스(Tantalus)에서 유래했습니다.",
+  74:"텅스텐(Tungsten)의 기호 W는 독일어 Wolfram에서 유래했습니다.",
+  75:"레늄(Rhenium)은 라틴어 Rhenus(라인강)에서 유래했습니다.",
+  76:"오스뮴(Osmium)은 그리스어 osme(냄새)에서 유래했습니다.",
+  77:"이리듐(Iridium)은 그리스어 iris(무지개)에서 유래했습니다.",
+  78:"백금(Platinum)은 스페인어 platina(작은 은)에서 유래했습니다.",
+  79:"금(Gold)의 기호 Au는 라틴어 aurum에서 유래했습니다.",
+  80:"수은(Mercury)의 기호 Hg는 라틴어 hydrargyrum에서 유래했습니다.",
+  81:"탈륨(Thallium)은 그리스어 thallos(푸른 새싹)에서 유래했습니다.",
+  82:"납(Lead)의 기호 Pb는 라틴어 plumbum에서 유래했습니다.",
+  83:"비스무트(Bismuth)는 독일어 weisse masse 계열 어원에서 유래한 것으로 알려져 있습니다.",
+  84:"폴로늄(Polonium)은 마리 퀴리의 조국 폴란드(Poland)에서 유래했습니다.",
+  85:"아스타틴(Astatine)은 그리스어 astatos(불안정한)에서 유래했습니다.",
+  86:"라돈(Radon)은 라듐(Radium) 계열 이름에서 파생되었습니다.",
+  87:"프랑슘(Francium)은 프랑스(France)에서 유래했습니다.",
+  88:"라듐(Radium)은 라틴어 radius(광선)에서 유래했습니다.",
+  89:"악티늄(Actinium)은 그리스어 aktis/aktinos(광선)에서 유래했습니다.",
+  90:"토륨(Thorium)은 북유럽 신화의 천둥의 신 토르(Thor)에서 유래했습니다.",
+  91:"프로트악티늄(Protactinium)은 ‘악티늄의 앞선 원소’라는 뜻에서 유래했습니다.",
+  92:"우라늄(Uranium)은 행성 천왕성 Uranus에서 유래했습니다.",
+  93:"넵투늄(Neptunium)은 행성 해왕성 Neptune에서 유래했습니다.",
+  94:"플루토늄(Plutonium)은 왜소행성으로 분류된 명왕성 Pluto에서 유래했습니다.",
+  95:"아메리슘(Americium)은 아메리카(America)에서 유래했습니다.",
+  96:"퀴륨(Curium)은 마리 퀴리와 피에르 퀴리의 이름에서 유래했습니다.",
+  97:"버클륨(Berkelium)은 미국 도시 버클리(Berkeley)에서 유래했습니다.",
+  98:"캘리포늄(Californium)은 미국 캘리포니아(California)에서 유래했습니다.",
+  99:"아인슈타이늄(Einsteinium)은 알베르트 아인슈타인의 이름에서 유래했습니다.",
+  100:"페르뮴(Fermium)은 과학자 엔리코 페르미의 이름에서 유래했습니다.",
+  101:"멘델레븀(Mendelevium)은 주기율표를 만든 드미트리 멘델레예프의 이름에서 유래했습니다.",
+  102:"노벨륨(Nobelium)은 노벨상의 알프레드 노벨 이름에서 유래했습니다.",
+  103:"로렌슘(Lawrencium)은 사이클로트론 개발로 유명한 어니스트 로런스의 이름에서 유래했습니다.",
+  104:"러더포듐(Rutherfordium)은 원자핵 연구의 개척자 어니스트 러더퍼드의 이름에서 유래했습니다.",
+  105:"더브늄(Dubnium)은 러시아의 연구도시 두브나(Dubna)에서 유래했습니다.",
+  106:"시보귬(Seaborgium)은 초중원소 연구를 이끈 글렌 시보그의 이름에서 유래했습니다.",
+  107:"보륨(Bohrium)은 물리학자 닐스 보어의 이름에서 유래했습니다.",
+  108:"하슘(Hassium)은 독일 헤센(Hessen)의 라틴식 이름 Hassia에서 유래했습니다.",
+  109:"마이트너륨(Meitnerium)은 핵분열 연구에 기여한 리제 마이트너의 이름에서 유래했습니다.",
+  110:"다름슈타튬(Darmstadtium)은 독일 도시 다름슈타트(Darmstadt)에서 유래했습니다.",
+  111:"뢴트게늄(Roentgenium)은 X선을 발견한 빌헬름 뢴트겐의 이름에서 유래했습니다.",
+  112:"코페르니슘(Copernicium)은 천문학자 니콜라우스 코페르니쿠스의 이름에서 유래했습니다.",
+  113:"니호늄(Nihonium)은 일본을 뜻하는 Nihon(니혼)에서 유래했습니다.",
+  114:"플레로븀(Flerovium)은 핵물리학자 게오르기 플료로프 이름과 플료로프 연구소에서 유래했습니다.",
+  115:"모스코븀(Moscovium)은 러시아 모스크바 지역(Moscow Oblast)에서 유래했습니다.",
+  116:"리버모륨(Livermorium)은 미국 리버모어 연구소가 있는 지명 Livermore에서 유래했습니다.",
+  117:"테네신(Tennessine)은 미국 테네시(Tennessee) 주와 관련 연구 기관들을 기려 붙인 이름입니다.",
+  118:"오가네손(Oganesson)은 초중원소 연구를 이끈 유리 오가네시안의 이름에서 유래했습니다."
 };
 
 const EL=[
@@ -753,6 +878,7 @@ function openPanel(el){
   rNote.innerHTML=relationMode?relationDescription(el):"";
   document.getElementById("story-text").textContent=ELEMENT_STORIES[el.n]||"이 원소의 이야기는 준비 중입니다.";
   document.getElementById("memory-text").textContent=MEMORY_POINTS[el.n]||"이 원소의 기억 포인트는 준비 중입니다.";
+  document.getElementById("name-origin-text").textContent=ELEMENT_NAME_ORIGINS[el.n]||"이 원소 이름의 유래는 준비 중입니다.";
   selectedElementN=el.n;
   applyRelationshipHighlight(el);
   const sh=shells(el.n);
