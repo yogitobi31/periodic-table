@@ -124,7 +124,7 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 .cell-lab-badge{position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:rgba(55,138,221,0.9);color:#fff;font-size:9px;line-height:16px;font-weight:600;pointer-events:none}
 #lab-dim{position:fixed;inset:0;background:rgba(20,24,32,0.16);backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px);opacity:0;pointer-events:none;transition:opacity .22s ease;z-index:85}
 #lab-dim.show{opacity:1;pointer-events:auto}
-#lab-panel{position:fixed;right:18px;bottom:82px;width:min(360px,calc(100vw - 24px));max-height:min(80vh,680px);overflow:auto;padding:16px;border-radius:18px;background:rgba(255,255,255,0.62);border:1px solid rgba(255,255,255,0.56);box-shadow:0 14px 30px rgba(20,26,34,0.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--text2);pointer-events:auto;opacity:0;transform:translateX(16px);transition:opacity .24s ease,transform .24s ease;z-index:95}
+#lab-panel{position:fixed;top:12px;right:12px;bottom:12px;width:min(388px,calc(100vw - 24px));max-height:none;overflow:auto;padding:16px;border-radius:18px;background:rgba(255,255,255,0.62);border:1px solid rgba(255,255,255,0.56);box-shadow:0 14px 30px rgba(20,26,34,0.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--text2);pointer-events:auto;opacity:0;transform:translateX(24px);transition:opacity .24s ease,transform .24s ease;z-index:95}
 #lab-panel.show{opacity:1;transform:translateX(0)}
 #lab-panel .lab-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
 .lab-title{font-size:17px;font-weight:600;color:var(--text)}
@@ -153,7 +153,7 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
   #lab-fab{height:48px;padding:0 12px;gap:6px}
   .lab-label{font-size:10px}
   .lab-icon{width:21px;height:21px}
-  #lab-panel{left:10px;right:10px;bottom:74px;width:auto;max-height:72vh;transform:translateY(18px)}
+  #lab-panel{top:auto;left:10px;right:10px;bottom:74px;width:auto;max-height:72vh;transform:translateY(18px)}
   #lab-panel.show{transform:translateY(0)}
 }
 
@@ -878,17 +878,19 @@ function renderLabTray(){
   run.disabled=totalSelectedCount()===0;
   document.querySelectorAll(".cell-lab-badge").forEach(n=>n.remove());
   document.querySelectorAll(".cell.lab-selected").forEach(n=>n.classList.remove("lab-selected"));
-  Object.entries(selectedElements).forEach(([sym,count])=>{
-    const el=EL.find(x=>x.sym===sym);
-    if(!el)return;
-    const cell=document.querySelector(`.cell[data-n="${el.n}"]`);
-    if(!cell)return;
-    cell.classList.add("lab-selected");
-    const badge=document.createElement("span");
-    badge.className="cell-lab-badge";
-    badge.textContent=`×${count}`;
-    cell.appendChild(badge);
-  });
+  if(isLabOpen){
+    Object.entries(selectedElements).forEach(([sym,count])=>{
+      const el=EL.find(x=>x.sym===sym);
+      if(!el)return;
+      const cell=document.querySelector(`.cell[data-n="${el.n}"]`);
+      if(!cell)return;
+      cell.classList.add("lab-selected");
+      const badge=document.createElement("span");
+      badge.className="cell-lab-badge";
+      badge.textContent=`×${count}`;
+      cell.appendChild(badge);
+    });
+  }
 }
 function addToLab(el){
   if(totalSelectedCount()>=LAB_MAX_ELEMENTS){
@@ -1313,7 +1315,12 @@ function setLabOpen(open){
   labDim.classList.toggle("show",open);
   labFab.setAttribute("aria-expanded",String(open));
   labPanel.setAttribute("aria-hidden",String(!open));
-  if(!open)labResult.textContent="";
+  if(!open){
+    labResult.textContent="";
+    renderLabTray();
+  }else{
+    renderLabTray();
+  }
 }
 if(labFab&&labPanel){
   labFab.addEventListener("click",()=>setLabOpen(!isLabOpen));
