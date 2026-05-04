@@ -118,14 +118,15 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
   .fb:hover,.fb.active,.lb:hover,.lb.active,#pclose:hover{background:rgba(255,255,255,0.92);color:#1a1a18}
 }
 
-#lab-fab-wrap{position:fixed;right:18px;bottom:18px;z-index:90;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none}
+#grid{position:relative;z-index:1}
 .cell{position:relative}
 .cell.lab-selected{box-shadow:0 0 0 1.5px rgba(55,138,221,0.5) inset,0 0 0 1px rgba(255,255,255,0.52)}
 .cell-lab-badge{position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:rgba(55,138,221,0.9);color:#fff;font-size:9px;line-height:16px;font-weight:600;pointer-events:none}
-#lab-dim{position:fixed;inset:0;background:rgba(20,24,32,0.16);backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px);opacity:0;pointer-events:none;transition:opacity .22s ease;z-index:85}
-#lab-dim.show{opacity:1;pointer-events:auto}
-#lab-panel{position:fixed;top:12px;right:12px;bottom:12px;width:min(388px,calc(100vw - 24px));max-height:none;overflow:auto;padding:16px;border-radius:18px;background:rgba(255,255,255,0.62);border:1px solid rgba(255,255,255,0.56);box-shadow:0 14px 30px rgba(20,26,34,0.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--text2);pointer-events:auto;opacity:0;transform:translateX(24px);transition:opacity .24s ease,transform .24s ease;z-index:95}
-#lab-panel.show{opacity:1;transform:translateX(0)}
+#lab-overlay{position:fixed;inset:0;opacity:0;pointer-events:none;transition:opacity .22s ease;z-index:40}
+#lab-overlay.open{opacity:1;pointer-events:auto}
+#lab-backdrop{position:absolute;inset:0;background:rgba(20,24,32,0.16);backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px)}
+#lab-panel{position:fixed;top:12px;right:12px;bottom:12px;width:min(388px,calc(100vw - 24px));max-height:none;overflow:auto;padding:16px;border-radius:18px;background:rgba(255,255,255,0.62);border:1px solid rgba(255,255,255,0.56);box-shadow:0 14px 30px rgba(20,26,34,0.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--text2);pointer-events:auto;opacity:0;transform:translateX(24px);transition:opacity .24s ease,transform .24s ease;z-index:70}
+#lab-overlay.open #lab-panel{opacity:1;transform:translateX(0)}
 #lab-panel .lab-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
 .lab-title{font-size:17px;font-weight:600;color:var(--text)}
 .lab-desc{font-size:12px;margin-top:4px}
@@ -141,7 +142,7 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 .lab-run{flex:1;height:38px;border:none;border-radius:10px;background:#2f7ed6;color:#fff;font-weight:600;cursor:pointer}
 .lab-run:disabled{opacity:.45;cursor:not-allowed}
 .lab-reset{height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--border2);background:rgba(255,255,255,0.6);cursor:pointer}
-#lab-fab{pointer-events:auto;display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.62);background:linear-gradient(140deg,rgba(255,255,255,0.72),rgba(248,246,242,0.44));box-shadow:0 10px 22px rgba(23,28,36,0.14), inset 0 1px 0 rgba(255,255,255,0.68);color:#2a313d;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+#lab-fab{position:fixed;right:18px;bottom:18px;z-index:80;pointer-events:auto;display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.62);background:linear-gradient(140deg,rgba(255,255,255,0.72),rgba(248,246,242,0.44));box-shadow:0 10px 22px rgba(23,28,36,0.14), inset 0 1px 0 rgba(255,255,255,0.68);color:#2a313d;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 #lab-fab:hover{transform:translateY(-2px);box-shadow:0 14px 26px rgba(23,28,36,0.18), inset 0 1px 0 rgba(255,255,255,0.72)}
 #lab-fab:active{transform:scale(.965)}
 #lab-fab:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(55,138,221,0.28),0 10px 22px rgba(23,28,36,0.16)}
@@ -149,12 +150,11 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 .lab-icon{width:23px;height:23px;display:block}
 .lab-icon *{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:680px){
-  #lab-fab-wrap{right:12px;bottom:12px}
-  #lab-fab{height:48px;padding:0 12px;gap:6px}
+  #lab-fab{height:48px;padding:0 12px;gap:6px;right:12px;bottom:12px}
   .lab-label{font-size:10px}
   .lab-icon{width:21px;height:21px}
   #lab-panel{top:auto;left:10px;right:10px;bottom:74px;width:auto;max-height:72vh;transform:translateY(18px)}
-  #lab-panel.show{transform:translateY(0)}
+  #lab-overlay.open #lab-panel{transform:translateY(0)}
 }
 
 footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;background:transparent}
@@ -253,8 +253,16 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
 	  </div>
 </div>
 
-<div id="lab-dim" aria-hidden="true"></div>
-<div id="lab-fab-wrap">
+<button id="lab-fab" aria-label="실험실 열기" aria-expanded="false" type="button">
+  <svg class="lab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M9 3.75h6"/>
+    <path d="M10 3.75v3.4l-5.2 9.24A2.5 2.5 0 0 0 6.98 20h10.04a2.5 2.5 0 0 0 2.18-3.61L14 7.15v-3.4"/>
+    <path d="M8.2 14.35c1.25-.35 2.35.88 3.8.88 1.32 0 2.25-.85 3.55-.85"/>
+  </svg>
+  <span class="lab-label">실험실</span>
+</button>
+<div id="lab-overlay" aria-hidden="true">
+  <div id="lab-backdrop"></div>
   <section id="lab-panel" aria-live="polite" aria-hidden="true">
     <div class="lab-header">
       <div>
@@ -272,14 +280,6 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
     </div>
     <div id="lab-result" class="lab-result"></div>
   </section>
-  <button id="lab-fab" aria-label="실험실 열기" type="button">
-    <svg class="lab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M9 3.75h6"/>
-      <path d="M10 3.75v3.4l-5.2 9.24A2.5 2.5 0 0 0 6.98 20h10.04a2.5 2.5 0 0 0 2.18-3.61L14 7.15v-3.4"/>
-      <path d="M8.2 14.35c1.25-.35 2.35.88 3.8.88 1.32 0 2.25-.85 3.55-.85"/>
-    </svg>
-    <span class="lab-label">실험실</span>
-  </button>
 </div>
 
 <footer>
@@ -1302,7 +1302,8 @@ document.querySelectorAll(".lb[data-master-view]").forEach(btn=>{
 });
 
 const labFab=document.getElementById("lab-fab");
-const labDim=document.getElementById("lab-dim");
+const labOverlay=document.getElementById("lab-overlay");
+const labBackdrop=document.getElementById("lab-backdrop");
 const labClose=document.getElementById("lab-close");
 const labTray=document.getElementById("lab-tray");
 const labRun=document.getElementById("lab-run");
@@ -1310,10 +1311,11 @@ const labReset=document.getElementById("lab-reset");
 const labResult=document.getElementById("lab-result");
 const labPanel=document.getElementById("lab-panel");
 function setLabOpen(open){
+  if(!labFab||!labOverlay||!labPanel||!labResult)return;
   isLabOpen=open;
-  labPanel.classList.toggle("show",open);
-  labDim.classList.toggle("show",open);
+  labOverlay.classList.toggle("open",open);
   labFab.setAttribute("aria-expanded",String(open));
+  labOverlay.setAttribute("aria-hidden",String(!open));
   labPanel.setAttribute("aria-hidden",String(!open));
   if(!open){
     labResult.textContent="";
@@ -1322,10 +1324,10 @@ function setLabOpen(open){
     renderLabTray();
   }
 }
-if(labFab&&labPanel){
+if(labFab&&labOverlay&&labBackdrop&&labPanel&&labClose&&labTray&&labRun&&labReset&&labResult){
   labFab.addEventListener("click",()=>setLabOpen(!isLabOpen));
   labClose.addEventListener("click",()=>setLabOpen(false));
-  labDim.addEventListener("click",()=>setLabOpen(false));
+  labBackdrop.addEventListener("click",()=>setLabOpen(false));
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&isLabOpen)setLabOpen(false);});
   labTray.addEventListener("click",e=>{
     const btn=e.target.closest("button[data-sym]");
