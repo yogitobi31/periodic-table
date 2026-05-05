@@ -32,6 +32,9 @@ header{max-width:1280px;margin:0 auto 18px}
 h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 .sub{font-size:13px;color:#6b6b66}
 #app{max-width:1280px;margin:0 auto}
+#main-layout{display:block}
+#table-area{min-width:0}
+@media(min-width:1024px){#main-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,420px);gap:14px;align-items:start}#table-area{min-width:0}#labFab{display:none}#labTrayPanel{position:sticky;top:18px;left:auto;right:auto;bottom:auto;z-index:2;width:100%;max-height:calc(100vh - 42px);display:block;opacity:1;transform:none;pointer-events:auto}#labTrayPanel:not(.show){display:block;opacity:.85;max-height:104px;overflow:hidden}#labTrayPanel:not(.show) .lab-desktop-only{display:none}}
 #controls{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;align-items:center}
 #search{flex:1;min-width:130px;max-width:190px;height:30px;font-size:12px;padding:0 10px;
   border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);outline:none}
@@ -188,13 +191,18 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 .lab-label{font-size:12px;letter-spacing:.02em;color:#3b4556}
 .lab-icon{width:23px;height:23px;display:block}
 .lab-icon *{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
-@media(max-width:680px){
+@media(max-width:1023px){
   #labFab{height:48px;padding:0 12px;gap:6px;right:12px;bottom:12px}
   .lab-label{font-size:10px}
   .lab-icon{width:21px;height:21px}
-  #labTrayPanel{left:8px;right:8px;bottom:8px;width:calc(100vw - 16px);max-height:54vh}
+  #labTrayPanel{left:8px;right:8px;bottom:8px;width:calc(100vw - 16px);max-height:72vh;border-radius:16px 16px 12px 12px}
+  #labTrayPanel:not(.show){display:block;max-height:72px;overflow:hidden;padding:10px 12px}
+  #labTrayPanel:not(.show) .lab-mobile-only{display:block}
+  #labTrayPanel.show .lab-mobile-only{display:none}
+  #labTrayPanel:not(.show) .lab-panel-head,#labTrayPanel:not(.show) #labSearch,#labTrayPanel:not(.show) #labTray,#labTrayPanel:not(.show) #labLimit,#labTrayPanel:not(.show) #labReactionStage,#labTrayPanel:not(.show) .lab-actions,#labTrayPanel:not(.show) #labResult,#labTrayPanel:not(.show) #labCodex{display:none}
   #labTray{grid-template-columns:repeat(2,1fr)}
 }
+@media(min-width:1024px){.lab-mobile-only{display:none}}
 
 footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;background:transparent}
 .credit-title{font-family:Georgia,"Times New Roman",serif;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--text2)}
@@ -255,10 +263,13 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
     <button class="lb" data-layer="valence">최외각 전자</button>
   </div>
   <div id="layer-note">기본: 기존 원소 분류 색상을 표시합니다.</div>
+  <div id="main-layout">
+  <div id="table-area">
   <div id="labModeGuide">실험실 모드 — 섞고 싶은 원소를 선택하세요.</div>
   <div id="legend"></div>
   <div id="grid"></div>
   <div id="series-area"></div>
+  </div>
   <div id="panel">
     <div id="panel-top">
       <div id="pbadge"><span class="psym" id="psym"></span><span class="pnum" id="pnum"></span></div>
@@ -302,6 +313,12 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
   <span class="lab-label">실험실</span>
 </button>
 <section id="labTrayPanel" aria-live="polite">
+  <div class="lab-mobile-only" style="display:none">
+    <div class="lab-panel-head" style="margin-bottom:0">
+      <div class="lab-panel-title">선택 원소: <span id="labCompactSelection">없음</span></div>
+      <button id="labExpandBtn" class="lab-reset" type="button" style="height:30px">실험실 열기</button>
+    </div>
+  </div>
   <div class="lab-panel-head">
     <div>
       <div class="lab-panel-title">반응 실험실</div>
@@ -309,17 +326,18 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
     </div>
     <div id="labDiscoveryCount" class="lab-discovery-count">발견한 조합 0 / 7</div>
   </div>
-  <input id="labSearch" type="text" placeholder="실험실 검색 (이름·영문·기호·번호)" />
-  <div id="labTray"></div>
-  <div id="labLimit" class="lab-limit"></div>
-  <div id="labReactionStage" class="lab-reaction-stage" aria-hidden="true"></div>
-  <div class="lab-actions">
+  <input id="labSearch" class="lab-desktop-only" type="text" placeholder="실험실 검색 (이름·영문·기호·번호)" />
+  <div id="labTray" class="lab-desktop-only"></div>
+  <div id="labLimit" class="lab-limit lab-desktop-only"></div>
+  <div id="labReactionStage" class="lab-reaction-stage lab-desktop-only" aria-hidden="true"></div>
+  <div class="lab-actions lab-desktop-only">
     <button id="labRun" class="lab-run" type="button" disabled>실험 시작</button>
     <button id="labReset" class="lab-reset" type="button">초기화</button>
   </div>
-  <div id="labResult" class="lab-result"></div>
-  <div id="labCodex" class="lab-codex"></div>
+  <div id="labResult" class="lab-result lab-desktop-only"></div>
+  <div id="labCodex" class="lab-codex lab-desktop-only"></div>
 </section>
+</div>
 
 <footer>
   <div class="credit-title">ELEMENT RELATION ATLAS</div>
@@ -1369,6 +1387,8 @@ const labSearch=document.getElementById("labSearch");
 const labReactionStage=document.getElementById("labReactionStage");
 const labCodex=document.getElementById("labCodex");
 const labDiscoveryCount=document.getElementById("labDiscoveryCount");
+const labCompactSelection=document.getElementById("labCompactSelection");
+const labExpandBtn=document.getElementById("labExpandBtn");
 const experimentResults={
   "Cl+H":{equation:"H + Cl → HCl",formula:"HCl",nameKo:"염화수소",nameEn:"Hydrogen Chloride",summary:"수소와 염소가 만나 만들어지는 자극성 기체예요.",explanation:"수소 원자와 염소 원자가 전자쌍을 공유해 HCl 분자를 만듭니다.",realLife:"물에 녹이면 염산이 되어 금속 세정과 화학 실험에 쓰여요.",safety:"caution",discoveryMessage:"콕 쏘는 기체의 존재가 감지됐어요!"},
   "C+H":{equation:"C + H → CH₄",formula:"CH₄",nameKo:"메테인",nameEn:"Methane",summary:"탄소와 수소로 이루어진 가장 단순한 탄화수소예요.",explanation:"탄소는 네 개의 공유 결합을 만들기 쉬워 수소 네 개와 안정한 CH₄ 구조를 이룹니다.",realLife:"천연가스의 주성분으로 난방·발전에 쓰여요.",safety:"dangerous",discoveryMessage:"에너지 연료의 기본 분자를 발견했어요!"},
@@ -1410,6 +1430,11 @@ function saveDiscoveredKeys(keys){
 function renderDiscoveryCount(){
   if(!labDiscoveryCount)return;
   labDiscoveryCount.textContent=`발견한 조합 ${loadDiscoveredKeys().length} / ${Object.keys(experimentResults).length}`;
+}
+
+function renderCompactSelection(){
+  if(!labCompactSelection)return;
+  labCompactSelection.textContent=selectedElements.length?selectedElements.join(", "):"없음";
 }
 function renderLabCodex(){
   renderDiscoveryCount();
@@ -1483,6 +1508,7 @@ function renderExperimentResult(){
     </article>
   `;
   renderLabCodex();
+  renderCompactSelection();
 }
 function runExperimentWithReaction(){
   if(isLabReacting||selectedElements.length<2)return;
@@ -1509,7 +1535,7 @@ function setLabMode(open){
   labModeGuide.classList.toggle("show",open);
   labFab.setAttribute("aria-expanded",String(open));
   labFab.classList.toggle("active",open);
-  labFab.querySelector(".lab-label").textContent=open?"실험실 모드":"실험실";
+  labFab.querySelector(".lab-label").textContent=open?"실험실 닫기":"실험실";
   if(!open){
     labResult.textContent="";
     labLimitMessage="";
@@ -1521,6 +1547,8 @@ function setLabMode(open){
   }
   renderLabTray();
   renderLabCodex();
+  renderCompactSelection();
+  renderCompactSelection();
 }
 function toggleLab(){
   setLabMode(!labMode);
@@ -1528,6 +1556,7 @@ function toggleLab(){
 function bindLabEvents(){
   if(!labFab||!labTray||!labRun||!labReset||!labResult||!labSearch)return;
   labFab.addEventListener("click",toggleLab);
+  if(labExpandBtn)labExpandBtn.addEventListener("click",()=>setLabMode(true));
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&labMode)setLabMode(false);});
   labTray.addEventListener("click",e=>{
     const btn=e.target.closest("button[data-sym]");
@@ -1558,6 +1587,8 @@ function bindLabEvents(){
   });
   renderLabTray();
   renderLabCodex();
+  renderCompactSelection();
+  renderCompactSelection();
 }
 
 if(document.readyState==="loading"){
