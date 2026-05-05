@@ -125,26 +125,62 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 .cell-lab-badge{position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:rgba(55,138,221,0.9);color:#fff;font-size:9px;line-height:16px;font-weight:600;pointer-events:none}
 #labModeGuide{display:none;margin:0 0 8px 2px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.58);border:1px solid rgba(0,0,0,0.08);font-size:12px;color:var(--text2)}
 #labModeGuide.show{display:block}
-#labTrayPanel{display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:60;padding:10px;border-radius:14px;background:rgba(255,255,255,0.76);border:1px solid rgba(0,0,0,0.09);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 20px rgba(23,28,36,0.14)}
+#labTrayPanel{display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:60;width:min(520px,calc(100vw - 24px));max-height:calc(100vh - 84px);overflow:auto;padding:12px;border-radius:14px;background:rgba(255,255,255,0.76);border:1px solid rgba(0,0,0,0.09);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 20px rgba(23,28,36,0.14);pointer-events:auto}
 #labTrayPanel.show{display:block}
+.lab-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.lab-panel-title{font-size:13px;font-weight:600;color:#243244;letter-spacing:.01em}
+.lab-panel-sub{font-size:11px;color:var(--text2);line-height:1.45;margin-top:2px}
+.lab-discovery-count{font-size:10px;color:#385c80;padding:4px 8px;border-radius:999px;background:rgba(55,138,221,0.10);border:1px solid rgba(55,138,221,0.20);white-space:nowrap}
 #labSearch{width:100%;height:34px;padding:0 10px;font-size:12px;border:0.5px solid var(--border2);border-radius:8px;background:var(--bg);color:var(--text);outline:none}
-#labTray{display:flex;flex-wrap:wrap;gap:8px;min-height:40px;padding:8px 0}
-.lab-empty{font-size:12px;line-height:1.4;color:var(--text2)}
-.lab-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;background:rgba(55,138,221,0.12);border:1px solid rgba(55,138,221,0.35);font-size:12px;color:#19456b}
-.lab-chip button{width:24px;height:24px;border-radius:999px;border:none;background:rgba(25,69,107,0.15);cursor:pointer}
+#labTray{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 0 8px}
+.lab-slot{position:relative;min-height:64px;border-radius:12px;border:1px solid rgba(55,138,221,0.16);background:linear-gradient(150deg,rgba(255,255,255,0.62),rgba(239,246,255,0.38));display:flex;align-items:center;justify-content:center;overflow:hidden}
+.lab-slot::before{content:"";position:absolute;inset:6px;border-radius:9px;border:1px dashed rgba(55,138,221,0.18);pointer-events:none}
+.lab-slot.filled{border-color:rgba(55,138,221,0.34);box-shadow:inset 0 1px 0 rgba(255,255,255,0.72),0 4px 12px rgba(23,28,36,0.06)}
+.lab-slot-symbol{font-size:20px;font-weight:700;color:#1d4164;line-height:1}
+.lab-slot-name{font-size:9px;color:var(--text2);margin-top:4px;white-space:nowrap}
+.lab-slot-index{position:absolute;left:7px;top:6px;font-size:9px;color:rgba(46,80,112,.58)}
+.lab-slot button{position:absolute;right:6px;top:6px;width:22px;height:22px;border-radius:999px;border:none;background:rgba(25,69,107,0.12);color:#244260;cursor:pointer;z-index:1}
+.lab-slot.empty{color:var(--text3);font-size:11px}
 .lab-limit,.lab-result{font-size:11px;color:#8a4f2b;margin-top:8px;min-height:16px}
 .lab-result{color:var(--text2)}
+.lab-reaction-stage{position:relative;height:74px;margin-top:8px;border-radius:12px;background:rgba(255,255,255,0.44);border:1px solid rgba(55,138,221,0.16);overflow:hidden;display:none}
+.lab-reaction-stage.show{display:block}
+.lab-reactor-core{position:absolute;left:50%;top:50%;width:28px;height:28px;border-radius:50%;transform:translate(-50%,-50%);border:1px solid rgba(55,138,221,0.36);box-shadow:0 0 0 0 rgba(55,138,221,0.22)}
+.lab-orbit-symbol{position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.78);border:1px solid rgba(55,138,221,0.22);font-size:12px;font-weight:700;color:#1d4164}
+.lab-particle{position:absolute;width:4px;height:4px;border-radius:50%;background:rgba(55,138,221,0.45)}
+#labTrayPanel.reacting .lab-slot.filled{animation:slotGlow .95s ease-in-out both}
+#labTrayPanel.reacting .lab-reactor-core{animation:reactorPulse .95s ease-in-out both}
+#labTrayPanel.reacting .lab-orbit-symbol{animation:orbitGather .95s cubic-bezier(.2,.7,.2,1) both}
+#labTrayPanel.reacting .lab-particle{animation:particleDrift .95s ease-in-out both}
+@keyframes slotGlow{0%{box-shadow:0 0 0 rgba(55,138,221,0)}45%{box-shadow:0 0 20px rgba(55,138,221,0.30),inset 0 0 12px rgba(55,138,221,0.12)}100%{box-shadow:inset 0 1px 0 rgba(255,255,255,0.72),0 4px 12px rgba(23,28,36,0.06)}}
+@keyframes reactorPulse{0%{transform:translate(-50%,-50%) scale(.75);opacity:.45;box-shadow:0 0 0 0 rgba(55,138,221,0.24)}50%{opacity:1;box-shadow:0 0 0 18px rgba(55,138,221,0.04),0 0 24px rgba(55,138,221,0.24)}100%{transform:translate(-50%,-50%) scale(1.06);opacity:.35;box-shadow:0 0 0 28px rgba(55,138,221,0)}}
+@keyframes orbitGather{0%{transform:translate(var(--from-x),var(--from-y)) scale(.92);opacity:.62}70%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(0,0) scale(.58);opacity:0}}
+@keyframes particleDrift{0%{transform:translate(var(--from-x),var(--from-y));opacity:0}35%{opacity:1}100%{transform:translate(0,0);opacity:0}}
 .lab-result-card{margin-top:10px;padding:14px;border-radius:12px;background:linear-gradient(145deg,rgba(255,255,255,0.9),rgba(241,248,255,0.72));border:1px solid rgba(46,126,214,0.24);box-shadow:0 8px 18px rgba(23,28,36,0.10)}
+.lab-result-card.missing{background:linear-gradient(145deg,rgba(255,255,255,0.86),rgba(248,246,242,0.66));border-style:dashed;border-color:rgba(0,0,0,0.16)}
 .lab-result-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
 .lab-result-title{font-size:13px;font-weight:700;color:#1d3b5a}
-.lab-result-badge{font-size:10px;padding:3px 8px;border-radius:999px;background:rgba(47,126,214,0.14);color:#265b8e;font-weight:600}
+.lab-result-badges{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.lab-result-badge,.lab-new-badge{font-size:10px;padding:3px 8px;border-radius:999px;background:rgba(47,126,214,0.14);color:#265b8e;font-weight:600}
+.lab-new-badge{background:rgba(32,150,111,0.14);color:#217052}
 .lab-result-eq{font-size:17px;font-weight:700;color:#1a2736;margin-bottom:6px}
 .lab-result-name{font-size:12px;color:#36485c;line-height:1.5}
-.lab-result-missing{margin-top:10px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.6);border:1px dashed rgba(0,0,0,0.16);font-size:12px;color:var(--text2)}
+.lab-result-desc{font-size:12px;color:#4d5d6e;line-height:1.5;margin-top:7px}
+.lab-result-feature{font-size:11px;color:#556a5f;line-height:1.45;margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.07)}
+.lab-reward{margin-top:8px;font-size:11px;color:#217052}
 .lab-actions{display:flex;gap:8px;margin-top:12px}
 .lab-run{flex:1;height:38px;border:none;border-radius:10px;background:#2f7ed6;color:#fff;font-weight:600;cursor:pointer}
 .lab-run:disabled{opacity:.45;cursor:not-allowed}
 .lab-reset{height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--border2);background:rgba(255,255,255,0.6);cursor:pointer}
+.lab-codex{margin-top:12px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.08)}
+.lab-codex-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.lab-codex-title{font-size:12px;font-weight:600;color:#243244}
+.lab-codex-list{display:grid;gap:6px;max-height:132px;overflow:auto;padding-right:2px}
+.lab-codex-empty{font-size:11px;line-height:1.45;color:var(--text2);padding:8px;border-radius:9px;background:rgba(255,255,255,0.38)}
+.lab-codex-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border-radius:10px;background:rgba(255,255,255,0.48);border:1px solid rgba(0,0,0,0.06)}
+.lab-codex-main{min-width:0}
+.lab-codex-name{font-size:11px;font-weight:600;color:#26384b}
+.lab-codex-meta{font-size:10px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #labFab{position:fixed;right:18px;bottom:18px;z-index:80;pointer-events:auto;display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.62);background:linear-gradient(140deg,rgba(255,255,255,0.72),rgba(248,246,242,0.44));box-shadow:0 10px 22px rgba(23,28,36,0.14), inset 0 1px 0 rgba(255,255,255,0.68);color:#2a313d;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 #labFab:hover{transform:translateY(-2px);box-shadow:0 14px 26px rgba(23,28,36,0.18), inset 0 1px 0 rgba(255,255,255,0.72)}
 #labFab:active{transform:scale(.965)}
@@ -156,7 +192,8 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
   #labFab{height:48px;padding:0 12px;gap:6px;right:12px;bottom:12px}
   .lab-label{font-size:10px}
   .lab-icon{width:21px;height:21px}
-  #labTrayPanel{left:8px;right:8px;bottom:8px;max-height:42vh;overflow:auto}
+  #labTrayPanel{left:8px;right:8px;bottom:8px;width:calc(100vw - 16px);max-height:54vh}
+  #labTray{grid-template-columns:repeat(2,1fr)}
 }
 
 footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;background:transparent}
@@ -265,14 +302,23 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
   <span class="lab-label">실험실</span>
 </button>
 <section id="labTrayPanel" aria-live="polite">
+  <div class="lab-panel-head">
+    <div>
+      <div class="lab-panel-title">반응 실험실</div>
+      <div class="lab-panel-sub">원소를 눌러 슬롯에 장착하고, 짧은 반응 후 결과를 발견해 보세요.</div>
+    </div>
+    <div id="labDiscoveryCount" class="lab-discovery-count">발견한 조합 0 / 7</div>
+  </div>
   <input id="labSearch" type="text" placeholder="실험실 검색 (이름·영문·기호·번호)" />
   <div id="labTray"></div>
   <div id="labLimit" class="lab-limit"></div>
+  <div id="labReactionStage" class="lab-reaction-stage" aria-hidden="true"></div>
   <div class="lab-actions">
     <button id="labRun" class="lab-run" type="button" disabled>실험 시작</button>
     <button id="labReset" class="lab-reset" type="button">초기화</button>
   </div>
   <div id="labResult" class="lab-result"></div>
+  <div id="labCodex" class="lab-codex"></div>
 </section>
 
 <footer>
@@ -812,6 +858,10 @@ let labMode=false;
 let selectedElements=[];
 const LAB_MAX_ELEMENTS=4;
 let labLimitMessage="";
+let isLabReacting=false;
+let labReactionTimer=null;
+const LAB_DISCOVERY_STORAGE_KEY="periodicTableLabDiscoveries";
+const labSessionNewDiscoveries=new Set();
 
 const EXAMPLES={
   "Cl-Na":"Na + Cl → NaCl",
@@ -853,27 +903,32 @@ function handleElementSelection(el){
 }
 
 function totalSelectedCount(){return selectedElements.length;}
+function getElementBySymbol(sym){return EL.find(x=>x.sym===sym);}
 function renderLabTray(){
   const tray=document.getElementById("labTray");
   const limit=document.getElementById("labLimit");
   const run=document.getElementById("labRun");
   if(!tray)return;
-  const entries=[...selectedElements];
   tray.innerHTML="";
-  if(!entries.length)tray.innerHTML='<div class="lab-empty">원소를 선택해 주세요.</div>';
-  entries.forEach(sym=>{
-    const chip=document.createElement("div");
-    chip.className="lab-chip";
-    chip.innerHTML=`<span>${sym}</span><button type="button" data-sym="${sym}">×</button>`;
-    tray.appendChild(chip);
-  });
-  limit.textContent=labLimitMessage;
-  run.disabled=totalSelectedCount()<2;
+  for(let i=0;i<LAB_MAX_ELEMENTS;i++){
+    const sym=selectedElements[i];
+    const el=sym?getElementBySymbol(sym):null;
+    const slot=document.createElement("div");
+    slot.className=`lab-slot ${el?"filled":"empty"}`;
+    if(el){
+      slot.innerHTML=`<span class="lab-slot-index">0${i+1}</span><button type="button" data-sym="${el.sym}" aria-label="${el.name} 제거">×</button><div><div class="lab-slot-symbol">${el.sym}</div><div class="lab-slot-name">${el.name}</div></div>`;
+    }else{
+      slot.innerHTML=`<span class="lab-slot-index">0${i+1}</span><span>빈 반응 슬롯</span>`;
+    }
+    tray.appendChild(slot);
+  }
+  if(limit)limit.textContent=labLimitMessage;
+  if(run)run.disabled=totalSelectedCount()<2||isLabReacting;
   document.querySelectorAll(".cell-lab-badge").forEach(n=>n.remove());
   document.querySelectorAll(".cell.lab-selected").forEach(n=>n.classList.remove("lab-selected"));
   if(labMode){
-    selectedElements.forEach((sym,idx)=>{
-      const el=EL.find(x=>x.sym===sym);
+    selectedElements.forEach(sym=>{
+      const el=getElementBySymbol(sym);
       if(!el)return;
       const cell=document.querySelector(`.cell[data-n="${el.n}"]`);
       if(!cell)return;
@@ -1311,37 +1366,131 @@ const labResult=document.getElementById("labResult");
 const labTrayPanel=document.getElementById("labTrayPanel");
 const labModeGuide=document.getElementById("labModeGuide");
 const labSearch=document.getElementById("labSearch");
+const labReactionStage=document.getElementById("labReactionStage");
+const labCodex=document.getElementById("labCodex");
+const labDiscoveryCount=document.getElementById("labDiscoveryCount");
 const experimentResults={
-  "Cl+H":{equation:"H + Cl → HCl",name:"염화수소",formula:"HCl",type:"산성 기체"},
-  "C+H+O":{equation:"C + H + O → 유기물 계열",name:"유기물 계열 조합",formula:"C-H-O",type:"생명·유기 화학"},
-  "C+O":{equation:"C + O → CO₂",name:"이산화탄소",formula:"CO₂",type:"산화 반응"},
-  "Fe+O":{equation:"Fe + O → Fe₂O₃",name:"산화철",formula:"Fe₂O₃",type:"부식·산화"},
-  "H+N":{equation:"N + H → NH₃",name:"암모니아",formula:"NH₃",type:"질소 고정"},
-  "H+O":{equation:"H + O → H₂O",name:"물",formula:"H₂O",type:"기본 분자"},
-  "Cl+Na":{equation:"Na + Cl → NaCl",name:"소금",formula:"NaCl",type:"이온 결합"}
+  "Cl+H":{equation:"H + Cl → HCl",name:"염화수소",formula:"HCl",type:"산성 기체",description:"수소와 염소가 만나 형성되는 기체로, 물에 녹으면 강한 산성을 띱니다.",feature:"위산의 주요 성분인 염산과 연결해 볼 수 있어요."},
+  "C+H+O":{equation:"C + H + O → 유기물 계열",name:"유기물 계열 조합",formula:"C-H-O",type:"생명·유기 화학",description:"탄소 골격에 수소와 산소가 더해지면 당, 알코올, 유기산 같은 다양한 분자군으로 확장됩니다.",feature:"음식, 향, 생체 에너지 분자까지 이어지는 조합입니다."},
+  "C+O":{equation:"C + O → CO₂",name:"이산화탄소",formula:"CO₂",type:"산화 반응",description:"탄소가 산소와 결합해 만들어지는 안정적인 산화물입니다.",feature:"호흡, 연소, 탄산음료와 기후 시스템에서 자주 등장합니다."},
+  "Fe+O":{equation:"Fe + O → Fe₂O₃",name:"산화철",formula:"Fe₂O₃",type:"부식·산화",description:"철이 산소와 반응해 붉은빛 산화물을 만드는 대표적인 산화 반응입니다.",feature:"녹슨 철, 안료, 토양의 붉은 색과 연결됩니다."},
+  "H+N":{equation:"N + H → NH₃",name:"암모니아",formula:"NH₃",type:"질소 고정",description:"질소와 수소가 결합한 자극적인 냄새의 염기성 분자입니다.",feature:"비료 생산과 냉매, 질소 순환을 이해하는 핵심 물질입니다."},
+  "H+O":{equation:"H + O → H₂O",name:"물",formula:"H₂O",type:"기본 분자",description:"수소와 산소가 만나 형성되는 대표적인 화합물입니다.",feature:"생명 유지에 필수적이며 지구 환경의 기준이 되는 물질입니다."},
+  "Cl+Na":{equation:"Na + Cl → NaCl",name:"소금",formula:"NaCl",type:"이온 결합",description:"나트륨과 염소가 전자를 주고받아 만드는 안정적인 결정성 화합물입니다.",feature:"음식의 짠맛과 체내 전해질 균형에 깊게 연결되어 있습니다."}
 };
 
 function buildCombinationKey(symbols){
   return [...symbols].sort().join("+");
 }
-
+function loadDiscoveredKeys(){
+  try{
+    const raw=localStorage.getItem(LAB_DISCOVERY_STORAGE_KEY);
+    if(!raw)return [];
+    const parsed=JSON.parse(raw);
+    return Array.isArray(parsed)?parsed.filter(key=>experimentResults[key]):[];
+  }catch(e){
+    return [];
+  }
+}
+function saveDiscoveredKeys(keys){
+  try{
+    localStorage.setItem(LAB_DISCOVERY_STORAGE_KEY,JSON.stringify([...new Set(keys)].filter(key=>experimentResults[key])));
+  }catch(e){}
+}
+function renderDiscoveryCount(){
+  if(!labDiscoveryCount)return;
+  labDiscoveryCount.textContent=`발견한 조합 ${loadDiscoveredKeys().length} / ${Object.keys(experimentResults).length}`;
+}
+function renderLabCodex(){
+  renderDiscoveryCount();
+  if(!labCodex)return;
+  const discovered=loadDiscoveredKeys();
+  const list=discovered.map(key=>({key,result:experimentResults[key]}));
+  labCodex.innerHTML=`
+    <div class="lab-codex-head">
+      <div class="lab-codex-title">발견 도감</div>
+      <div class="lab-discovery-count">${discovered.length} / ${Object.keys(experimentResults).length}</div>
+    </div>
+    <div class="lab-codex-list">
+      ${list.length?list.map(({key,result})=>`
+        <div class="lab-codex-item">
+          <div class="lab-codex-main">
+            <div class="lab-codex-name">${result.name} <span class="lab-result-badge">${result.formula}</span></div>
+            <div class="lab-codex-meta">${key.split("+").join(" + ")} · ${result.type}</div>
+          </div>
+          ${labSessionNewDiscoveries.has(key)?'<span class="lab-new-badge">NEW</span>':''}
+        </div>
+      `).join(""):'<div class="lab-codex-empty">아직 발견한 조합이 없습니다. 예: H와 O를 슬롯에 넣고 실험을 시작해 보세요.</div>'}
+    </div>
+  `;
+}
+function renderReactionStage(){
+  if(!labReactionStage)return;
+  const points=[[-160,-22],[160,-22],[-120,24],[120,24]];
+  const particles=[[-190,-8],[190,12],[-86,-34],[78,34],[0,-42],[0,42]];
+  labReactionStage.innerHTML=`<div class="lab-reactor-core"></div>${selectedElements.map((sym,idx)=>{
+    const [x,y]=points[idx]||[0,0];
+    return `<div class="lab-orbit-symbol" style="--from-x:${x}px;--from-y:${y}px">${sym}</div>`;
+  }).join("")}${particles.map(([x,y])=>`<span class="lab-particle" style="left:50%;top:50%;--from-x:${x}px;--from-y:${y}px"></span>`).join("")}`;
+}
 function renderExperimentResult(){
   const key=buildCombinationKey(selectedElements);
   const result=experimentResults[key];
   if(!result){
-    labResult.innerHTML=`<div class="lab-result-missing">아직 등록되지 않은 조합이에요.</div>`;
+    labResult.innerHTML=`
+      <article class="lab-result-card missing">
+        <div class="lab-result-head">
+          <strong class="lab-result-title">관찰 기록</strong>
+          <span class="lab-result-badge">미등록 조합</span>
+        </div>
+        <div class="lab-result-eq">${selectedElements.join(" + ")}</div>
+        <div class="lab-result-name">이번 실험에서는 뚜렷한 생성물을 찾지 못했어요.</div>
+        <div class="lab-result-desc">조건을 바꾸거나 다른 원소를 더해 보면 새로운 반응 경로를 발견할 수 있습니다.</div>
+      </article>`;
     return;
+  }
+  const discovered=loadDiscoveredKeys();
+  const isNew=!discovered.includes(key);
+  if(isNew){
+    discovered.push(key);
+    saveDiscoveredKeys(discovered);
+    labSessionNewDiscoveries.add(key);
   }
   labResult.innerHTML=`
     <article class="lab-result-card">
       <div class="lab-result-head">
-        <strong class="lab-result-title">실험 결과 확인</strong>
-        <span class="lab-result-badge">${result.type}</span>
+        <strong class="lab-result-title">${result.name}</strong>
+        <div class="lab-result-badges">
+          ${isNew?'<span class="lab-new-badge">NEW</span>':''}
+          <span class="lab-result-badge">${result.type}</span>
+        </div>
       </div>
-      <div class="lab-result-eq">${result.equation}</div>
-      <div class="lab-result-name">생성 물질: <strong>${result.name}</strong> (${result.formula})</div>
+      <div class="lab-result-eq">${result.formula}</div>
+      <div class="lab-result-name">${result.equation}</div>
+      <div class="lab-result-desc">${result.description}</div>
+      <div class="lab-result-feature">${result.feature}</div>
+      ${isNew?'<div class="lab-reward">새로운 조합을 발견했어요!</div>':''}
     </article>
   `;
+  renderLabCodex();
+}
+function runExperimentWithReaction(){
+  if(isLabReacting||selectedElements.length<2)return;
+  isLabReacting=true;
+  labResult.textContent="";
+  labLimitMessage="";
+  renderLabTray();
+  renderReactionStage();
+  if(labReactionStage)labReactionStage.classList.add("show");
+  if(labTrayPanel)labTrayPanel.classList.add("reacting");
+  labReactionTimer=window.setTimeout(()=>{
+    isLabReacting=false;
+    labReactionTimer=null;
+    if(labTrayPanel)labTrayPanel.classList.remove("reacting");
+    if(labReactionStage)labReactionStage.classList.remove("show");
+    renderExperimentResult();
+    renderLabTray();
+  },950);
 }
 function setLabMode(open){
   if(!labFab||!labTrayPanel||!labResult||!labModeGuide)return;
@@ -1351,8 +1500,17 @@ function setLabMode(open){
   labFab.setAttribute("aria-expanded",String(open));
   labFab.classList.toggle("active",open);
   labFab.querySelector(".lab-label").textContent=open?"실험실 모드":"실험실";
-  if(!open){labResult.textContent="";labLimitMessage="";}
+  if(!open){
+    labResult.textContent="";
+    labLimitMessage="";
+    if(labReactionStage)labReactionStage.classList.remove("show");
+    if(labTrayPanel)labTrayPanel.classList.remove("reacting");
+    if(labReactionTimer)window.clearTimeout(labReactionTimer);
+    labReactionTimer=null;
+    isLabReacting=false;
+  }
   renderLabTray();
+  renderLabCodex();
 }
 function toggleLab(){
   setLabMode(!labMode);
@@ -1373,19 +1531,23 @@ function bindLabEvents(){
     selectedElements=[];
     labLimitMessage="";
     labResult.textContent="";
+    if(labReactionStage)labReactionStage.classList.remove("show");
+    if(labTrayPanel)labTrayPanel.classList.remove("reacting");
+    if(labReactionTimer)window.clearTimeout(labReactionTimer);
+    labReactionTimer=null;
+    isLabReacting=false;
     labSearch.value="";
     activeSearch="";
     applyFilter();
     renderLabTray();
   });
-  labRun.addEventListener("click",()=>{
-    renderExperimentResult();
-  });
+  labRun.addEventListener("click",runExperimentWithReaction);
   labSearch.addEventListener("input",function(){
     activeSearch=this.value.trim();
     applyFilter();
   });
   renderLabTray();
+  renderLabCodex();
 }
 
 if(document.readyState==="loading"){
