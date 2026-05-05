@@ -8,6 +8,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#ffffff;--bg2:#f5f5f3;--bg3:#eeece8;
+  --mobile-lab-toolbar-height:118px;
   --page-backdrop-top:#f6f2eb;--page-backdrop-bottom:#efeae2;
   --text:#1a1a18;--text2:#6b6b66;--text3:#9b9b96;
   --panel-bg:rgba(255,255,255,0.72);--panel-text:#1a1a18;--panel-muted:#6b6b66;--panel-soft:rgba(255,255,255,0.55);
@@ -203,14 +204,23 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 .lab-icon{width:23px;height:23px;display:block}
 .lab-icon *{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:900px){
-  #labFab{display:inline-flex;height:44px;padding:0 12px;gap:6px;right:10px;top:10px;bottom:auto}
+  #app.lab-open #table-area{padding-bottom:calc(var(--mobile-lab-toolbar-height) + 16px)}
+  #labFab{display:inline-flex;height:40px;padding:0 10px;gap:6px;right:10px;top:10px;bottom:auto}
   .lab-label{font-size:10px}
-  .lab-icon{width:21px;height:21px}
-  #labTrayPanel{left:8px;right:8px;bottom:8px;width:calc(100vw - 16px);max-height:42vh;border-radius:16px 16px 12px 12px}
-  #labTray{grid-template-columns:repeat(2,1fr)}
-  #labCodex .lab-codex-list{display:none}
-  #labCodex.expanded .lab-codex-list{display:grid}
-  #labTray{grid-template-columns:repeat(2,1fr)}
+  .lab-icon{width:20px;height:20px}
+  #labTrayPanel{left:0;right:0;top:0;bottom:0;width:100vw;max-height:none;padding:0;background:transparent;border:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:none;display:none}
+  #labTrayPanel.show{display:block}
+  #labTrayPanel .lab-panel-head{position:fixed;top:8px;left:8px;right:8px;z-index:95;margin:0;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,0.92);border:1px solid rgba(0,0,0,0.08);pointer-events:auto}
+  #labTrayPanel .lab-panel-sub{display:none}
+  #labTrayPanel .lab-head-actions{gap:6px}
+  #labTrayPanel #labSearch,#labTrayPanel #labLimit,#labTrayPanel #labReactionStage,#labTrayPanel #labResult,#labTrayPanel #labCodex{display:none!important}
+  #labTrayPanel #labTray{position:fixed;left:8px;right:8px;bottom:8px;z-index:95;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:8px;border-radius:12px;background:rgba(255,255,255,0.94);border:1px solid rgba(0,0,0,0.09);pointer-events:auto}
+  #labTrayPanel .lab-slot{min-height:56px}
+  #labTrayPanel .lab-slot-symbol{font-size:16px}
+  #labTrayPanel .lab-slot-name{display:none}
+  #labTrayPanel .lab-actions{position:fixed;left:8px;right:8px;bottom:78px;z-index:95;display:flex!important;margin:0;gap:6px;pointer-events:auto}
+  #labTrayPanel .lab-reset{display:none}
+  #labTrayPanel .lab-run{height:40px;border-radius:10px;font-size:13px}
 }
 @media(min-width:901px){
   .lab-mobile-only{display:none}
@@ -335,7 +345,7 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
   </div>
   <div class="lab-panel-head">
     <div>
-      <div class="lab-panel-title">반응 실험실</div>
+      <div class="lab-panel-title">← 주기율표 / 반응 실험실</div>
       <div class="lab-panel-sub">원소를 눌러 슬롯에 장착하고, 짧은 반응 후 결과를 발견해 보세요.</div>
     </div>
     <div class="lab-head-actions"><div id="labDiscoveryCount" class="lab-discovery-count">발견한 조합 0 / 17</div><button id="labCloseBtn" class="lab-close-btn" type="button" aria-label="실험실 닫기">✕</button></div>
