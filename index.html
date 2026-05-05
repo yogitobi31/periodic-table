@@ -224,6 +224,13 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
   #labTrayPanel .lab-reset{display:none}
   #labTrayPanel .lab-run{height:40px;border-radius:10px;font-size:13px}
 }
+#mobileLabOverlay{display:none}
+@media(max-width:900px){
+  #mobileLabOverlay.show{position:fixed;inset:0;z-index:9999;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(248,250,252,0.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);pointer-events:auto}
+  #mobileLabOverlay .mobile-reaction-card{width:min(100%,360px);max-height:calc(100dvh - 48px);overflow:auto;border-radius:28px;background:rgba(255,255,255,0.96);border:1px solid rgba(0,0,0,0.08);padding:16px;box-shadow:0 18px 32px rgba(20,25,35,0.2)}
+  #mobileLabOverlay .lab-reaction-stage{display:flex;margin:4px 0 8px;height:150px}
+  #mobileLabOverlay .mobile-overlay-actions{display:flex;justify-content:flex-end;margin-top:10px}
+}
 @media(min-width:901px){
   .lab-mobile-only{display:none}
   #labCodex .lab-codex-list{display:grid!important}
@@ -371,6 +378,7 @@ footer{max-width:1280px;margin:28px auto 0;text-align:center;padding:12px 8px;ba
   <div id="labResult" class="lab-result lab-desktop-only"></div>
   <div id="labCodex" class="lab-codex lab-desktop-only"></div>
 </section>
+<div id="mobileLabOverlay" aria-live="polite"></div>
 </div>
 
 <footer>
@@ -1526,6 +1534,7 @@ const labCompactSelection=document.getElementById("labCompactSelection");
 const labExpandBtn=document.getElementById("labExpandBtn");
 const labCloseBtn=document.getElementById("labCloseBtn");
 const appRoot=document.getElementById("app");
+const mobileLabOverlay=document.getElementById("mobileLabOverlay");
 let labCodexExpanded=window.matchMedia("(min-width:901px)").matches;
 const experimentResults={
   "Cl+H":{equation:"H + Cl → HCl",formula:"HCl",nameKo:"염화수소",nameEn:"Hydrogen Chloride",summary:"수소와 염소가 만나 만들어지는 자극성 기체예요.",explanation:"수소 원자와 염소 원자가 전자쌍을 공유해 HCl 분자를 만듭니다.",realLife:"물에 녹이면 염산이 되어 금속 세정과 화학 실험에 쓰여요.",safety:"caution",discoveryMessage:"콕 쏘는 기체의 존재가 감지됐어요!"},
@@ -1617,11 +1626,30 @@ function renderReactionStage(){
     return `<div class="lab-orbit-symbol" style="--from-x:${x}px;--from-y:${y}px">${sym}</div>`;
   }).join("")}${particles.map(([x,y])=>`<span class="lab-particle" style="left:50%;top:50%;--from-x:${x}px;--from-y:${y}px"></span>`).join("")}`;
 }
+function isMobileViewport(){
+  return window.matchMedia("(max-width:900px)").matches;
+}
+function hideMobileOverlay(){
+  if(!mobileLabOverlay)return;
+  mobileLabOverlay.classList.remove("show");
+  mobileLabOverlay.innerHTML="";
+}
+function showMobileReactionOverlay(resultMarkup=""){
+  if(!mobileLabOverlay||!isMobileViewport()||!labMode)return;
+  const points=[[-110,-14],[110,-14],[-80,26],[80,26]];
+  const particles=[[-130,-8],[130,12],[-56,-24],[48,28],[0,-30],[0,30]];
+  const reactionHtml=`<div class="lab-reaction-stage show"><div class="lab-reactor-core"></div>${selectedElements.map((sym,idx)=>{const [x,y]=points[idx]||[0,0];return `<div class="lab-orbit-symbol" style="--from-x:${x}px;--from-y:${y}px">${sym}</div>`;}).join("")}${particles.map(([x,y])=>`<span class="lab-particle" style="left:50%;top:50%;--from-x:${x}px;--from-y:${y}px"></span>`).join("")}</div>`;
+  mobileLabOverlay.innerHTML=`<div class="mobile-reaction-card">${reactionHtml}${resultMarkup}<div class="mobile-overlay-actions"><button id="mobileOverlayClose" class="lab-reset" type="button">닫기</button></div></div>`;
+  mobileLabOverlay.classList.add("show");
+  const closeBtn=document.getElementById("mobileOverlayClose");
+  if(closeBtn)closeBtn.addEventListener("click",hideMobileOverlay);
+}
 function renderExperimentResult(){
+  let resultMarkup="";
   const key=buildCombinationKey(selectedElements);
   const result=experimentResults[key];
   if(!result){
-    labResult.innerHTML=`
+    resultMarkup=`
       <article class="lab-result-card missing">
         <div class="lab-result-head">
           <strong class="lab-result-title">관찰 기록</strong>
@@ -1631,6 +1659,8 @@ function renderExperimentResult(){
         <div class="lab-result-name">아직 실험 데이터가 부족한 조합이에요.</div>
         <div class="lab-result-desc">일반적인 조건에서는 대표적인 화합물로 잘 알려져 있지 않아요. 다른 원소를 더하거나 조합을 바꿔 보세요.</div>
       </article>`;
+    labResult.innerHTML=resultMarkup;
+    if(isMobileViewport())showMobileReactionOverlay(resultMarkup);
     return;
   }
   const discovered=loadDiscoveredKeys();
@@ -1640,7 +1670,7 @@ function renderExperimentResult(){
     saveDiscoveredKeys(discovered);
     labSessionNewDiscoveries.add(key);
   }
-  labResult.innerHTML=`
+  resultMarkup=`
     <article class="lab-result-card">
       <div class="lab-result-head">
         <strong class="lab-result-title">${result.nameKo}</strong>
@@ -1656,6 +1686,8 @@ function renderExperimentResult(){
       ${isNew?'<div class="lab-reward">새로운 조합을 발견했어요!</div>':''}
     </article>
   `;
+  labResult.innerHTML=resultMarkup;
+  if(isMobileViewport())showMobileReactionOverlay(resultMarkup);
   renderLabCodex();
   renderCompactSelection();
 }
@@ -1666,6 +1698,7 @@ function runExperimentWithReaction(){
   labLimitMessage="";
   renderLabTray();
   renderReactionStage();
+  if(isMobileViewport())showMobileReactionOverlay();
   if(labReactionStage)labReactionStage.classList.add("show");
   if(labTrayPanel)labTrayPanel.classList.add("reacting");
   labReactionTimer=window.setTimeout(()=>{
@@ -1694,6 +1727,7 @@ function setLabMode(open){
     if(labReactionTimer)window.clearTimeout(labReactionTimer);
     labReactionTimer=null;
     isLabReacting=false;
+    hideMobileOverlay();
   }
   renderLabTray();
   renderLabCodex();
@@ -1726,6 +1760,7 @@ function bindLabEvents(){
     if(labReactionTimer)window.clearTimeout(labReactionTimer);
     labReactionTimer=null;
     isLabReacting=false;
+    hideMobileOverlay();
     labSearch.value="";
     activeSearch="";
     applyFilter();
