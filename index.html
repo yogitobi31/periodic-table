@@ -1370,13 +1370,23 @@ const labReactionStage=document.getElementById("labReactionStage");
 const labCodex=document.getElementById("labCodex");
 const labDiscoveryCount=document.getElementById("labDiscoveryCount");
 const experimentResults={
-  "Cl+H":{equation:"H + Cl → HCl",name:"염화수소",formula:"HCl",type:"산성 기체",description:"수소와 염소가 만나 형성되는 기체로, 물에 녹으면 강한 산성을 띱니다.",feature:"위산의 주요 성분인 염산과 연결해 볼 수 있어요."},
-  "C+H+O":{equation:"C + H + O → 유기물 계열",name:"유기물 계열 조합",formula:"C-H-O",type:"생명·유기 화학",description:"탄소 골격에 수소와 산소가 더해지면 당, 알코올, 유기산 같은 다양한 분자군으로 확장됩니다.",feature:"음식, 향, 생체 에너지 분자까지 이어지는 조합입니다."},
-  "C+O":{equation:"C + O → CO₂",name:"이산화탄소",formula:"CO₂",type:"산화 반응",description:"탄소가 산소와 결합해 만들어지는 안정적인 산화물입니다.",feature:"호흡, 연소, 탄산음료와 기후 시스템에서 자주 등장합니다."},
-  "Fe+O":{equation:"Fe + O → Fe₂O₃",name:"산화철",formula:"Fe₂O₃",type:"부식·산화",description:"철이 산소와 반응해 붉은빛 산화물을 만드는 대표적인 산화 반응입니다.",feature:"녹슨 철, 안료, 토양의 붉은 색과 연결됩니다."},
-  "H+N":{equation:"N + H → NH₃",name:"암모니아",formula:"NH₃",type:"질소 고정",description:"질소와 수소가 결합한 자극적인 냄새의 염기성 분자입니다.",feature:"비료 생산과 냉매, 질소 순환을 이해하는 핵심 물질입니다."},
-  "H+O":{equation:"H + O → H₂O",name:"물",formula:"H₂O",type:"기본 분자",description:"수소와 산소가 만나 형성되는 대표적인 화합물입니다.",feature:"생명 유지에 필수적이며 지구 환경의 기준이 되는 물질입니다."},
-  "Cl+Na":{equation:"Na + Cl → NaCl",name:"소금",formula:"NaCl",type:"이온 결합",description:"나트륨과 염소가 전자를 주고받아 만드는 안정적인 결정성 화합물입니다.",feature:"음식의 짠맛과 체내 전해질 균형에 깊게 연결되어 있습니다."}
+  "Cl+H":{equation:"H + Cl → HCl",formula:"HCl",nameKo:"염화수소",nameEn:"Hydrogen Chloride",summary:"수소와 염소가 만나 만들어지는 자극성 기체예요.",explanation:"수소 원자와 염소 원자가 전자쌍을 공유해 HCl 분자를 만듭니다.",realLife:"물에 녹이면 염산이 되어 금속 세정과 화학 실험에 쓰여요.",safety:"caution",discoveryMessage:"콕 쏘는 기체의 존재가 감지됐어요!"},
+  "C+H":{equation:"C + H → CH₄",formula:"CH₄",nameKo:"메테인",nameEn:"Methane",summary:"탄소와 수소로 이루어진 가장 단순한 탄화수소예요.",explanation:"탄소는 네 개의 공유 결합을 만들기 쉬워 수소 네 개와 안정한 CH₄ 구조를 이룹니다.",realLife:"천연가스의 주성분으로 난방·발전에 쓰여요.",safety:"dangerous",discoveryMessage:"에너지 연료의 기본 분자를 발견했어요!"},
+  "C+H+O":{equation:"C + H + O → 유기물 계열",formula:"C-H-O",nameKo:"유기물 계열 조합",nameEn:"Organic Family Mix",summary:"탄소·수소·산소 조합은 다양한 유기 분자로 확장돼요.",explanation:"이 세 원소는 결합 방식이 매우 다양해서 당, 알코올, 유기산 같은 분자군이 생깁니다.",realLife:"음식의 영양소와 향, 생체 에너지 분자에서 자주 나타나요.",safety:"caution",discoveryMessage:"생명 화학의 문이 열렸어요!"},
+  "C+O":{equation:"C + O → CO₂",formula:"CO₂",nameKo:"이산화탄소",nameEn:"Carbon Dioxide",summary:"탄소가 산소와 결합해 생기는 대표적인 기체예요.",explanation:"탄소가 산소에 의해 산화되면 안정한 CO₂ 분자로 정리됩니다.",realLife:"호흡, 탄산음료, 온실효과와 연결되는 핵심 기체예요.",safety:"caution",discoveryMessage:"거품과 호흡의 주인공이 나타났어요!"},
+  "Cl+Na":{equation:"Na + Cl → NaCl",formula:"NaCl",nameKo:"염화나트륨",nameEn:"Sodium Chloride",summary:"나트륨과 염소가 만나 만드는 대표적인 소금이에요.",explanation:"나트륨은 전자를 내주고 염소는 받아서 안정한 이온 결합 결정이 됩니다.",realLife:"식탁 소금, 생리식염수, 도로 제설 등에 쓰여요.",safety:"safe",discoveryMessage:"짠맛의 결정이 반짝이며 생성됐어요!"},
+  "Fe+O":{equation:"Fe + O → Fe₂O₃",formula:"Fe₂O₃",nameKo:"산화철",nameEn:"Iron(III) Oxide",summary:"철이 산소와 결합해 붉은 녹 성분을 만들어요.",explanation:"철이 산소와 반응해 전자를 잃으면 산화철 형태로 안정화됩니다.",realLife:"녹슨 철 표면, 붉은 안료, 토양 색에서 볼 수 있어요.",safety:"caution",discoveryMessage:"금속 표면에 붉은 변화가 포착됐어요!"},
+  "H+N":{equation:"N + H → NH₃",formula:"NH₃",nameKo:"암모니아",nameEn:"Ammonia",summary:"질소와 수소가 결합한 염기성 기체예요.",explanation:"질소 1개가 수소 3개와 공유 결합해 NH₃ 분자를 만듭니다.",realLife:"비료 생산과 산업 냉매 시스템에 활용돼요.",safety:"dangerous",discoveryMessage:"질소 고정의 핵심 분자가 완성됐어요!"},
+  "H+O":{equation:"H + O → H₂O",formula:"H₂O",nameKo:"물",nameEn:"Water",summary:"생명 유지에 필수적인 가장 친숙한 화합물이에요.",explanation:"산소 1개가 수소 2개와 공유 결합해 굽은 구조의 물 분자를 이룹니다.",realLife:"음용수, 강과 바다, 생명체 세포의 대부분을 차지해요.",safety:"safe",discoveryMessage:"생명의 분자, 물이 생성됐어요!"},
+  "H+O+O":{equation:"H + O + O → H₂O₂",formula:"H₂O₂",nameKo:"과산화수소",nameEn:"Hydrogen Peroxide",summary:"물보다 산소가 하나 더 많은 산화성 액체예요.",explanation:"산소-산소 결합을 가진 H₂O₂는 물보다 반응성이 커 소독 작용을 보입니다.",realLife:"상처 소독용(저농도), 표백, 세정 제품에 쓰여요.",safety:"caution",discoveryMessage:"산소가 더해진 강한 산화 분자가 나타났어요!"},
+  "Ag+Cl":{equation:"Ag + Cl → AgCl",formula:"AgCl",nameKo:"염화은",nameEn:"Silver Chloride",summary:"은과 염소가 결합한 흰색 고체 화합물이에요.",explanation:"은 이온과 염화 이온이 만나 물에 잘 녹지 않는 AgCl 침전을 만듭니다.",realLife:"광감광 재료와 분석 화학의 침전 반응에서 중요해요.",safety:"caution",discoveryMessage:"빛에 민감한 은의 결정이 생겼어요!"},
+  "Ca+C+O":{equation:"Ca + C + O → CaCO₃",formula:"CaCO₃",nameKo:"탄산칼슘",nameEn:"Calcium Carbonate",summary:"칼슘 기반 암석과 껍데기의 주성분이에요.",explanation:"칼슘 이온과 탄산 이온이 결합해 안정한 고체 결정 CaCO₃를 만듭니다.",realLife:"석회암, 분필, 조개껍데기, 달걀껍데기에서 볼 수 있어요.",safety:"safe",discoveryMessage:"지구의 껍질을 닮은 단단한 결정이 만들어졌어요!"},
+  "Cl+K":{equation:"K + Cl → KCl",formula:"KCl",nameKo:"염화칼륨",nameEn:"Potassium Chloride",summary:"칼륨과 염소가 만든 대표적인 이온 화합물이에요.",explanation:"칼륨이 전자를 잃고 염소가 받아 안정한 KCl 결정이 형성됩니다.",realLife:"비료 성분, 저염 소금 대체재로 활용돼요.",safety:"caution",discoveryMessage:"식물 영양에 중요한 염이 완성됐어요!"},
+  "Cu+S":{equation:"Cu + S → CuS",formula:"CuS",nameKo:"황화구리",nameEn:"Copper Sulfide",summary:"구리와 황이 결합한 어두운 색의 화합물이에요.",explanation:"금속 구리와 비금속 황이 결합해 황화물 광물 형태를 이룹니다.",realLife:"광물 자원과 반도체 소재 연구에서 다뤄져요.",safety:"caution",discoveryMessage:"광석 같은 어두운 결정이 나타났어요!"},
+  "Mg+O":{equation:"Mg + O → MgO",formula:"MgO",nameKo:"산화마그네슘",nameEn:"Magnesium Oxide",summary:"마그네슘이 산소와 반응해 생기는 흰색 산화물이예요.",explanation:"마그네슘은 전자를 잃고 산소는 받아서 안정한 이온성 MgO를 만듭니다.",realLife:"내화재, 제산제 성분, 세라믹 재료에 사용돼요.",safety:"caution",discoveryMessage:"밝은 빛의 반응 뒤 흰 고체가 남았어요!"},
+  "N+O":{equation:"N + O → NO₂",formula:"NO₂",nameKo:"이산화질소",nameEn:"Nitrogen Dioxide",summary:"질소와 산소가 결합한 갈색 계열의 자극성 기체예요.",explanation:"고온 연소 환경에서 질소와 산소가 반응해 NO₂가 생성될 수 있습니다.",realLife:"자동차 배기가스와 대기오염 문제에서 중요한 물질이에요.",safety:"dangerous",discoveryMessage:"대기 화학의 경고 신호가 감지됐어요!"},
+  "O+S":{equation:"S + O → SO₂",formula:"SO₂",nameKo:"이산화황",nameEn:"Sulfur Dioxide",summary:"황이 산소와 결합해 생기는 자극성 기체예요.",explanation:"황이 연소되면 산소와 결합해 SO₂가 생성됩니다.",realLife:"화산 가스, 산업 배출, 산성비 학습에서 자주 등장해요.",safety:"dangerous",discoveryMessage:"코를 찌르는 황 계열 기체가 확인됐어요!"},
+  "O+Si":{equation:"Si + O → SiO₂",formula:"SiO₂",nameKo:"이산화규소",nameEn:"Silicon Dioxide",summary:"규소와 산소가 만든 단단한 산화물이에요.",explanation:"규소가 산소와 결합해 매우 안정한 격자 구조의 SiO₂를 형성합니다.",realLife:"모래, 석영, 유리 재료의 핵심 성분이에요.",safety:"safe",discoveryMessage:"모래와 유리의 씨앗 분자가 완성됐어요!"}
 };
 
 function buildCombinationKey(symbols){
@@ -1415,8 +1425,8 @@ function renderLabCodex(){
       ${list.length?list.map(({key,result})=>`
         <div class="lab-codex-item">
           <div class="lab-codex-main">
-            <div class="lab-codex-name">${result.name} <span class="lab-result-badge">${result.formula}</span></div>
-            <div class="lab-codex-meta">${key.split("+").join(" + ")} · ${result.type}</div>
+            <div class="lab-codex-name">${result.nameKo} <span class="lab-result-badge">${result.formula}</span></div>
+            <div class="lab-codex-meta">${key.split("+").join(" + ")} · ${result.nameEn}</div>
           </div>
           ${labSessionNewDiscoveries.has(key)?'<span class="lab-new-badge">NEW</span>':''}
         </div>
@@ -1444,8 +1454,8 @@ function renderExperimentResult(){
           <span class="lab-result-badge">미등록 조합</span>
         </div>
         <div class="lab-result-eq">${selectedElements.join(" + ")}</div>
-        <div class="lab-result-name">이번 실험에서는 뚜렷한 생성물을 찾지 못했어요.</div>
-        <div class="lab-result-desc">조건을 바꾸거나 다른 원소를 더해 보면 새로운 반응 경로를 발견할 수 있습니다.</div>
+        <div class="lab-result-name">아직 실험 데이터가 부족한 조합이에요.</div>
+        <div class="lab-result-desc">일반적인 조건에서는 대표적인 화합물로 잘 알려져 있지 않아요. 다른 원소를 더하거나 조합을 바꿔 보세요.</div>
       </article>`;
     return;
   }
@@ -1459,16 +1469,16 @@ function renderExperimentResult(){
   labResult.innerHTML=`
     <article class="lab-result-card">
       <div class="lab-result-head">
-        <strong class="lab-result-title">${result.name}</strong>
+        <strong class="lab-result-title">${result.nameKo}</strong>
         <div class="lab-result-badges">
           ${isNew?'<span class="lab-new-badge">NEW</span>':''}
-          <span class="lab-result-badge">${result.type}</span>
+          <span class="lab-result-badge">${result.safety}</span>
         </div>
       </div>
       <div class="lab-result-eq">${result.formula}</div>
       <div class="lab-result-name">${result.equation}</div>
-      <div class="lab-result-desc">${result.description}</div>
-      <div class="lab-result-feature">${result.feature}</div>
+      <div class="lab-result-desc">${result.summary}</div>
+      <div class="lab-result-feature">${result.explanation}<br>실생활: ${result.realLife}<br>${result.discoveryMessage}</div>
       ${isNew?'<div class="lab-reward">새로운 조합을 발견했어요!</div>':''}
     </article>
   `;
