@@ -1646,6 +1646,9 @@ function showMobileReactionOverlay(resultMarkup=""){
 }
 function renderExperimentResult(){
   let resultMarkup="";
+  const totalReactions=Object.keys(experimentResults).length;
+  const discoveredBefore=loadDiscoveredKeys();
+
   const key=buildCombinationKey(selectedElements);
   const result=experimentResults[key];
   if(!result){
@@ -1656,14 +1659,15 @@ function renderExperimentResult(){
           <span class="lab-result-badge">미등록 조합</span>
         </div>
         <div class="lab-result-eq">${selectedElements.join(" + ")}</div>
-        <div class="lab-result-name">아직 실험 데이터가 부족한 조합이에요.</div>
-        <div class="lab-result-desc">일반적인 조건에서는 대표적인 화합물로 잘 알려져 있지 않아요. 다른 원소를 더하거나 조합을 바꿔 보세요.</div>
+        <div class="lab-result-name">아직 발견된 반응이 없어요.</div>
+        <div class="lab-result-desc">다른 조합을 시도해 보세요. 힌트: 더 친숙한 원소 조합을 찾아보세요.</div>
+        <div class="lab-result-feature">진행률: ${discoveredBefore.length} / ${totalReactions}</div>
       </article>`;
     labResult.innerHTML=resultMarkup;
     if(isMobileViewport())showMobileReactionOverlay(resultMarkup);
     return;
   }
-  const discovered=loadDiscoveredKeys();
+  const discovered=[...discoveredBefore];
   const isNew=!discovered.includes(key);
   if(isNew){
     discovered.push(key);
@@ -1683,7 +1687,8 @@ function renderExperimentResult(){
       <div class="lab-result-name">${result.equation}</div>
       <div class="lab-result-desc">${result.summary}</div>
       <div class="lab-result-feature">${result.explanation}<br>실생활: ${result.realLife}<br>${result.discoveryMessage}</div>
-      ${isNew?'<div class="lab-reward">새로운 조합을 발견했어요!</div>':''}
+      ${isNew?'<div class="lab-reward">새로운 조합을 발견했어요!</div>':'<div class="lab-reward">이미 발견한 조합이에요. 다른 원소도 시도해 보세요!</div>'}
+      <div class="lab-result-feature">발견한 조합 ${discovered.length} / ${totalReactions}</div>
     </article>
   `;
   labResult.innerHTML=resultMarkup;
@@ -1691,7 +1696,7 @@ function renderExperimentResult(){
   renderLabCodex();
   renderCompactSelection();
 }
-function runExperimentWithReaction(){
+function handleStartExperiment(){
   if(isLabReacting||selectedElements.length<2)return;
   isLabReacting=true;
   labResult.textContent="";
@@ -1766,7 +1771,7 @@ function bindLabEvents(){
     applyFilter();
     renderLabTray();
   });
-  labRun.addEventListener("click",runExperimentWithReaction);
+  labRun.addEventListener("click",handleStartExperiment);
   labSearch.addEventListener("input",function(){
     activeSearch=this.value.trim();
     applyFilter();
