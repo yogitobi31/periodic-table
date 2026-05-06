@@ -228,7 +228,9 @@ h1{font-size:20px;font-weight:500;margin-bottom:3px;color:#1a1a18}
 @media(max-width:900px){
   #mobileLabOverlay.show{position:fixed;inset:0;z-index:9999;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(248,250,252,0.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);pointer-events:auto}
   #mobileLabOverlay .mobile-reaction-card{width:min(100%,360px);max-height:calc(100dvh - 48px);overflow:auto;border-radius:28px;background:rgba(255,255,255,0.96);border:1px solid rgba(0,0,0,0.08);padding:16px;box-shadow:0 18px 32px rgba(20,25,35,0.2)}
-  #mobileLabOverlay .lab-reaction-stage{display:flex;margin:4px 0 8px;height:150px}
+  #mobileLabOverlay .lab-reaction-stage{display:flex!important;position:relative;isolation:isolate;margin:4px 0 8px;min-height:150px;height:clamp(150px,34vh,220px);overflow:hidden}
+  #mobileLabOverlay .lab-reactor-core,#mobileLabOverlay .lab-orbit-symbol,#mobileLabOverlay .lab-particle{z-index:2}
+  #mobileLabOverlay .lab-reactor-core{z-index:1}
   #mobileLabOverlay .mobile-overlay-actions{display:flex;justify-content:flex-end;margin-top:10px}
 }
 @media(min-width:901px){
@@ -1018,6 +1020,8 @@ const LAB_MAX_ELEMENTS=4;
 let labLimitMessage="";
 let isLabReacting=false;
 let labReactionTimer=null;
+let labAnimationPhase="idle";
+let labPhaseTimer=null;
 const LAB_DISCOVERY_STORAGE_KEY="periodicTableLabDiscoveries";
 const labSessionNewDiscoveries=new Set();
 
@@ -1636,13 +1640,46 @@ function hideMobileOverlay(){
 }
 function showMobileReactionOverlay(resultMarkup=""){
   if(!mobileLabOverlay||!isMobileViewport()||!labMode)return;
-  const points=[[-110,-14],[110,-14],[-80,26],[80,26]];
-  const particles=[[-130,-8],[130,12],[-56,-24],[48,28],[0,-30],[0,30]];
-  const reactionHtml=`<div class="lab-reaction-stage show"><div class="lab-reactor-core"></div>${selectedElements.map((sym,idx)=>{const [x,y]=points[idx]||[0,0];return `<div class="lab-orbit-symbol" style="--from-x:${x}px;--from-y:${y}px">${sym}</div>`;}).join("")}${particles.map(([x,y])=>`<span class="lab-particle" style="left:50%;top:50%;--from-x:${x}px;--from-y:${y}px"></span>`).join("")}</div>`;
+  const stageSize=getMobileStageSize();
+  const points=getMobileReactionPoints(stageSize.width,stageSize.height);
+  const particles=getMobileParticlePoints(stageSize.width,stageSize.height);
+  const stageStyle=`style="--stage-w:${stageSize.width}px;--stage-h:${stageSize.height}px"`;
+  const reactionHtml=`<div class="lab-reaction-stage show" ${stageStyle}><div class="lab-reactor-core"></div>${selectedElements.map((sym,idx)=>{const [x,y]=points[idx]||[0,0];return `<div class="lab-orbit-symbol" style="--from-x:${x}px;--from-y:${y}px">${sym}</div>`;}).join("")}${particles.map(([x,y])=>`<span class="lab-particle" style="left:50%;top:50%;--from-x:${x}px;--from-y:${y}px"></span>`).join("")}</div>`;
   mobileLabOverlay.innerHTML=`<div class="mobile-reaction-card">${reactionHtml}${resultMarkup}<div class="mobile-overlay-actions"><button id="mobileOverlayClose" class="lab-reset" type="button">닫기</button></div></div>`;
   mobileLabOverlay.classList.add("show");
   const closeBtn=document.getElementById("mobileOverlayClose");
   if(closeBtn)closeBtn.addEventListener("click",hideMobileOverlay);
+}
+function getMobileStageSize(){
+  if(!mobileLabOverlay)return {width:300,height:170};
+  const card=mobileLabOverlay.querySelector(".mobile-reaction-card");
+  const measuredWidth=card?.clientWidth||mobileLabOverlay.clientWidth||0;
+  const measuredHeight=card?.clientHeight||0;
+  return {
+    width:measuredWidth>40?Math.max(220,Math.round(measuredWidth-32)):300,
+    height:measuredHeight>100?Math.max(150,Math.round(Math.min(220,measuredHeight*0.38))):170
+  };
+}
+function getMobileReactionPoints(width,height){
+  const x=Math.max(72,Math.round(width*0.3));
+  const y=Math.max(16,Math.round(height*0.18));
+  const innerY=Math.max(22,Math.round(height*0.2));
+  return [[-x,-y],[x,-y],[-Math.round(x*0.7),innerY],[Math.round(x*0.7),innerY]];
+}
+function getMobileParticlePoints(width,height){
+  const px=Math.max(86,Math.round(width*0.36));
+  const py=Math.max(26,Math.round(height*0.2));
+  return [[-px,-8],[px,12],[-Math.round(px*0.45),-py],[Math.round(px*0.4),Math.round(py*0.85)],[0,-Math.round(py*1.2)],[0,Math.round(py*1.2)]];
+}
+function setLabAnimationPhase(phase){
+  labAnimationPhase=phase;
+}
+function runAfterMobileLayout(callback){
+  if(!isMobileViewport()){
+    callback();
+    return;
+  }
+  window.requestAnimationFrame(()=>window.requestAnimationFrame(callback));
 }
 function renderExperimentResult(){
   let resultMarkup="";
@@ -1699,20 +1736,32 @@ function renderExperimentResult(){
 function handleStartExperiment(){
   if(isLabReacting||selectedElements.length<2)return;
   isLabReacting=true;
+  setLabAnimationPhase("selecting");
   labResult.textContent="";
   labLimitMessage="";
   renderLabTray();
-  renderReactionStage();
-  if(isMobileViewport())showMobileReactionOverlay();
-  if(labReactionStage)labReactionStage.classList.add("show");
-  if(labTrayPanel)labTrayPanel.classList.add("reacting");
+  runAfterMobileLayout(()=>{
+    renderReactionStage();
+    if(isMobileViewport())showMobileReactionOverlay();
+    if(labReactionStage)labReactionStage.classList.add("show");
+    if(labTrayPanel)labTrayPanel.classList.add("reacting");
+    setLabAnimationPhase("combining");
+  });
+  if(labPhaseTimer)window.clearTimeout(labPhaseTimer);
+  labPhaseTimer=window.setTimeout(()=>{
+    if(isLabReacting)setLabAnimationPhase("combining");
+  },120);
   labReactionTimer=window.setTimeout(()=>{
     isLabReacting=false;
     labReactionTimer=null;
+    if(labPhaseTimer)window.clearTimeout(labPhaseTimer);
+    labPhaseTimer=null;
     if(labTrayPanel)labTrayPanel.classList.remove("reacting");
     if(labReactionStage)labReactionStage.classList.remove("show");
+    setLabAnimationPhase("result");
     renderExperimentResult();
     renderLabTray();
+    setLabAnimationPhase("completed");
   },950);
 }
 function setLabMode(open){
@@ -1730,8 +1779,11 @@ function setLabMode(open){
     if(labReactionStage)labReactionStage.classList.remove("show");
     if(labTrayPanel)labTrayPanel.classList.remove("reacting");
     if(labReactionTimer)window.clearTimeout(labReactionTimer);
+    if(labPhaseTimer)window.clearTimeout(labPhaseTimer);
     labReactionTimer=null;
+    labPhaseTimer=null;
     isLabReacting=false;
+    setLabAnimationPhase("idle");
     hideMobileOverlay();
   }
   renderLabTray();
@@ -1763,8 +1815,11 @@ function bindLabEvents(){
     if(labReactionStage)labReactionStage.classList.remove("show");
     if(labTrayPanel)labTrayPanel.classList.remove("reacting");
     if(labReactionTimer)window.clearTimeout(labReactionTimer);
+    if(labPhaseTimer)window.clearTimeout(labPhaseTimer);
     labReactionTimer=null;
+    labPhaseTimer=null;
     isLabReacting=false;
+    setLabAnimationPhase("idle");
     hideMobileOverlay();
     labSearch.value="";
     activeSearch="";
